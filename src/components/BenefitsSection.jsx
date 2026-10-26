@@ -1,0 +1,65 @@
+import React from 'react';
+import { Truck, Shield, Headphones, Star } from 'lucide-react';
+import { motion } from 'framer-motion';
+
+const ICON_COMPONENTS = {
+  delivery: Truck,
+  security: Shield,
+  support: Headphones,
+  quality: Star
+};
+
+export default function BenefitsSection({ benefits }) {
+  return (
+    <section className="w-[96%] max-w-[1600px] mx-auto px-1 sm:px-2 py-4 sm:py-6">
+      {/* Heading */}
+      <div className="flex items-center justify-between mb-5 sm:mb-6">
+        <div className="flex items-center gap-3">
+          <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-[#1d1d1f] font-sans">
+            The Kirana Promise
+          </h2>
+          <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#f5f5f7] border border-black/[0.05] text-[11px] font-medium text-[#86868b] tracking-normal">
+            Standards
+          </span>
+        </div>
+      </div>
+
+      {/* 4 Benefits */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 text-center">
+        {benefits.map((item) => {
+          const Icon = ICON_COMPONENTS[item.iconType] || Star;
+
+          return (
+            <motion.div 
+              key={item.id} 
+              whileHover={{ y: -3, scale: 1.01 }}
+              whileTap={{ scale: 0.985 }}
+              transition={{ type: "spring", stiffness: 350, damping: 25 }}
+              className="group flex flex-col items-center justify-center p-6 rounded-[24px] bg-white border border-black/[0.06] shadow-apple-card hover:shadow-apple-hover transition-all duration-300 cursor-default"
+            >
+              {/* Icon badge */}
+              <motion.div 
+                whileHover={{ scale: 1.08 }}
+                transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                className="w-12 h-12 sm:w-13 sm:h-13 rounded-[16px] bg-[#f5f5f7] text-[#1d1d1f] group-hover:bg-emerald-600 group-hover:text-white group-hover:shadow-md group-hover:shadow-emerald-600/20 transition-all duration-300 flex items-center justify-center mb-4"
+                aria-hidden="true"
+              >
+                <Icon className="w-5 h-5 sm:w-6 sm:h-6 stroke-[1.8]" />
+              </motion.div>
+
+              {/* Title */}
+              <h3 className="text-sm sm:text-base font-semibold text-[#1d1d1f] font-sans">
+                {item.title}
+              </h3>
+
+              {/* Supporting Text */}
+              <p className="text-xs text-[#86868b] font-normal mt-1.5 max-w-[170px] leading-relaxed">
+                {item.subtitle}
+              </p>
+            </motion.div>
+          );
+        })}
+      </div>
+    </section>
+  );
+}

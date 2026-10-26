@@ -1,0 +1,60 @@
+# Dependencies
+node_modules/
+**/node_modules/
+.pnp
+.pnp.js
+
+# Production Build Outputs
+dist/
+**/dist/
+build/
+**/build/
+.tmp_apk_build/
+
+# Environment Variables and Local Secrets
+.env
+.env.local
+.env.*.local
+youpi-backend/.env
+youpi-backend/data/.secrets/
+
+# Databases and Local State
+*.sqlite
+*.sqlite-journal
+*.sqlite-wal
+*.sqlite-shm
+*.db
+*.db-journal
+youpi-backend/data/*.sqlite*
+youpi-backend/data/*.db*
+youpi-backend/data/browser-sessions/
+youpi-backend/data/berry_auth/
+youpi-backend/data/test_berry_auth/
+youpi-backend/data/backups/
+youpi-backend/data/whatsapp_session.json
+youpi-backend/berrysdk.db*
+youpi-backend/.berry-sessions/
+youpi-backend/youpi_pg.sqlite
+
+# Large Binary/Video Files (> 50MB, exceeds GitHub limit)
+*.mp4
+*.webm
+youpi-backend/assets/*.mp4
+youpi-backend/assets/*.webm
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+
+# Editor & OS Artifacts
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+.claude/
+.impeccable/
+.system_generated/
+*.tmp
+*.temp

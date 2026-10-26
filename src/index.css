@@ -1,0 +1,272 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    scroll-behavior: smooth;
+  }
+
+  html::-webkit-scrollbar {
+    display: none;
+    width: 0px;
+    height: 0px;
+  }
+
+  body {
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    letter-spacing: -0.011em;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    background: #fbfbfd;
+    color: #1d1d1f;
+  }
+
+  body::-webkit-scrollbar {
+    display: none;
+    width: 0px;
+    height: 0px;
+  }
+
+  * {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  *::-webkit-scrollbar {
+    display: none;
+    width: 0px;
+    height: 0px;
+  }
+
+  ::selection {
+    background-color: rgba(5, 150, 105, 0.15);
+    color: #064e3b;
+  }
+
+  *:focus-visible {
+    outline: 2px solid rgba(0, 113, 227, 0.5);
+    outline-offset: 2px;
+    border-radius: 12px;
+  }
+
+  a {
+    transition: color 0.2s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.2s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  button {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    text-rendering: optimizeLegibility;
+    letter-spacing: -0.025em;
+  }
+}
+
+@layer components {
+  /* Apple Glass morphism card */
+  .glass-card {
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(28px) saturate(190%);
+    -webkit-backdrop-filter: blur(28px) saturate(190%);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.03), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  }
+
+  .apple-pill {
+    border-radius: 980px;
+  }
+
+  /* Premium gradient text */
+  .gradient-text-brand {
+    background: linear-gradient(135deg, #059669, #0d9488, #047857);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .gradient-text-gold {
+    background: linear-gradient(135deg, #d97706, #f59e0b, #b45309);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Subtle noise texture overlay */
+  .noise-overlay::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0.015;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  }
+
+  /* Section divider line */
+  .section-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0,0,0,0.04) 20%, rgba(0,0,0,0.04) 80%, transparent);
+  }
+
+  /* Premium badge shimmer */
+  .badge-shimmer {
+    position: relative;
+    overflow: hidden;
+  }
+  .badge-shimmer::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    animation: shimmer 3s ease-in-out infinite;
+  }
+
+  /* Animated Outline Keyframes for Footer */
+  @keyframes spin-slow {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes beam-flow {
+    0% {
+      transform: translateX(-100%);
+    }
+    50% {
+      transform: translateX(100%);
+    }
+    100% {
+      transform: translateX(-100%);
+    }
+  }
+
+  @keyframes border-glow-pulse {
+    0%, 100% {
+      opacity: 0.65;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  .animate-spin-slow {
+    animation: spin-slow 8s linear infinite;
+  }
+
+  .animate-beam-flow {
+    animation: beam-flow 4.5s ease-in-out infinite;
+  }
+
+  .animate-border-glow-pulse {
+    animation: border-glow-pulse 3.5s ease-in-out infinite;
+  }
+
+  /* Living Apple iOS Dreamy Green Aurora & Wallpaper Animations */
+  @keyframes ios-bg-float {
+    0% {
+      transform: scale(1.04) translate3d(0, 0, 0);
+    }
+    50% {
+      transform: scale(1.08) translate3d(-18px, 14px, 0);
+    }
+    100% {
+      transform: scale(1.04) translate3d(0, 0, 0);
+    }
+  }
+
+  @keyframes aurora-sweep {
+    0% {
+      transform: translate3d(-6%, -5%, 0) scale(1) rotate(0deg);
+      opacity: 0.25;
+    }
+    50% {
+      transform: translate3d(8%, 6%, 0) scale(1.15) rotate(8deg);
+      opacity: 0.50;
+    }
+    100% {
+      transform: translate3d(-6%, -5%, 0) scale(1) rotate(0deg);
+      opacity: 0.25;
+    }
+  }
+
+  @keyframes aurora-wave-pulse {
+    0% {
+      transform: scale(0.95) translate3d(-10px, 6px, 0);
+      opacity: 0.30;
+    }
+    50% {
+      transform: scale(1.10) translate3d(12px, -10px, 0);
+      opacity: 0.55;
+    }
+    100% {
+      transform: scale(0.95) translate3d(-10px, 6px, 0);
+      opacity: 0.30;
+    }
+  }
+
+  .animate-ios-bg-float {
+    animation: ios-bg-float 16s ease-in-out infinite;
+    will-change: transform;
+  }
+
+  .animate-aurora-sweep {
+    animation: aurora-sweep 10s ease-in-out infinite;
+    will-change: transform, opacity;
+  }
+
+  .animate-aurora-pulse {
+    animation: aurora-wave-pulse 8s ease-in-out infinite;
+    will-change: transform, opacity;
+  }
+}
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+    width: 0px;
+    height: 0px;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  /* Text balance for better typography */
+  .text-balance {
+    text-wrap: balance;
+  }
+  .text-pretty {
+    text-wrap: pretty;
+  }
+
+  /* Subtle inner shadow for cards */
+  .inner-highlight {
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.7), inset 0 -1px 0 rgba(0,0,0,0.02);
+  }
+
+  /* Warm shadow for premium feel */
+  .shadow-warm {
+    box-shadow: 0 4px 20px rgba(180, 140, 80, 0.08);
+  }
+
+  /* Depth shadow for floating elements */
+  .shadow-depth {
+    box-shadow:
+      0 0 0 1px rgba(0,0,0,0.03),
+      0 2px 4px rgba(0,0,0,0.04),
+      0 8px 16px rgba(0,0,0,0.06),
+      0 24px 48px rgba(0,0,0,0.04);
+  }
+}
