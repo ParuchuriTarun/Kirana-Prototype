@@ -119,8 +119,18 @@ export default function App() {
   const [welcomeActive, setWelcomeActive] = useState(() => {
     if (typeof window !== 'undefined') {
       const hash = window.location.hash;
-      if (hash === '#welcome' || hash === '#/welcome') {
+      if (hash === '#welcome' || hash === '#/welcome' || window.location.search.includes('welcome')) {
         return true;
+      }
+      // On fresh load of the home page, play the welcome splash once per session
+      if (!hash || hash === '#/' || hash === '#' || hash === '') {
+        try {
+          const hasSeen = sessionStorage.getItem('kirana_seen_welcome');
+          if (!hasSeen) {
+            sessionStorage.setItem('kirana_seen_welcome', 'true');
+            return true;
+          }
+        } catch (_) {}
       }
     }
     return false;
@@ -547,7 +557,7 @@ export default function App() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0, scale: 1.04, filter: 'blur(8px)' }}
             transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-            className="fixed inset-0 z-[99999] w-screen h-screen overflow-hidden bg-[#0a1f14]"
+            className="fixed inset-0 z-[99999] w-full h-full h-[100dvh] overflow-hidden bg-[#133023] touch-none overscroll-none"
           >
             <IOSWelcomeScreen
               onEnter={() => {
@@ -748,7 +758,7 @@ export default function App() {
             exit={{ opacity: 0, scale: 0.95, y: 16 }}
             transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
             aria-label="Shopping Cart Summary"
-            className="fixed bottom-6 right-6 z-40"
+            className="fixed bottom-[max(1.5rem,env(safe-area-inset-bottom,1.5rem))] right-[max(1rem,env(safe-area-inset-right,1rem))] z-40"
           >
             <motion.button
               id="floating-cart-btn"

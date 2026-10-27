@@ -37,26 +37,68 @@ export default function IOSWelcomeScreen({ onEnter }) {
     wordRef.current.style.transform = `translate3d(${x}px, ${y}px, 0)`;
   }, []);
 
-  // 1. Responsive coordinate & size fitting
+  // 1. Responsive coordinate & size fitting for Mobile, Tablet & Desktop
   useEffect(() => {
     function fit() {
       const vw = window.innerWidth;
       const vh = window.innerHeight;
-      const s = Math.max(vw / WELCOME_IMG_DIMS.w, vh / WELCOME_IMG_DIMS.h);
-      const ox = (vw - WELCOME_IMG_DIMS.w * s) / 2;
-      const oy = (vh - WELCOME_IMG_DIMS.h * s) / 2;
+      
+      const CROP_RATIO = WELCOME_CROP_DIMS.w / WELCOME_CROP_DIMS.h; // 582 / 286 = 2.034965
+      
+      // Determine if viewport is portrait mobile/tablet or landscape desktop
+      const isPortrait = vw / vh < 1.15 || vw < 768;
+
+      let w, h, left, top;
+
+      if (isPortrait) {
+        // MOBILE & TABLET PORTRAIT:
+        // Size proportional to mobile viewport with luxury padding (78% of screen width, max 420px, min 250px)
+        w = Math.max(250, Math.min(vw * 0.78, 420));
+        h = w / CROP_RATIO;
+        left = (vw - w) / 2;
+        // Optically balanced vertical centering (47% from top feels perfectly centered on mobile screens)
+        top = (vh - h) * 0.47;
+      } else {
+        // DESKTOP & LANDSCAPE:
+        const s = Math.max(vw / WELCOME_IMG_DIMS.w, vh / WELCOME_IMG_DIMS.h);
+        const ox = (vw - WELCOME_IMG_DIMS.w * s) / 2;
+        const oy = (vh - WELCOME_IMG_DIMS.h * s) / 2;
+
+        let calcW = WELCOME_CROP_DIMS.w * s;
+        let calcH = WELCOME_CROP_DIMS.h * s;
+        let calcLeft = ox + WELCOME_CROP_DIMS.x * s;
+        let calcTop = oy + WELCOME_CROP_DIMS.y * s;
+
+        // If calculated dimensions would push it outside margins, fallback to centered layout
+        if (calcW > vw * 0.85 || calcLeft < 20 || (calcLeft + calcW) > vw - 20) {
+          w = Math.min(vw * 0.80, 680);
+          h = w / CROP_RATIO;
+          left = (vw - w) / 2;
+          top = (vh - h) * 0.48;
+        } else {
+          w = calcW;
+          h = calcH;
+          left = calcLeft;
+          top = calcTop;
+        }
+      }
+
       if (wordRef.current) {
-        wordRef.current.style.left = `${ox + WELCOME_CROP_DIMS.x * s}px`;
-        wordRef.current.style.top = `${oy + WELCOME_CROP_DIMS.y * s}px`;
-        wordRef.current.style.width = `${WELCOME_CROP_DIMS.w * s}px`;
-        wordRef.current.style.height = `${WELCOME_CROP_DIMS.h * s}px`;
-        wordRef.current.style.transformOrigin = '50% 55%';
+        wordRef.current.style.left = `${Math.round(left)}px`;
+        wordRef.current.style.top = `${Math.round(top)}px`;
+        wordRef.current.style.width = `${Math.round(w)}px`;
+        wordRef.current.style.height = `${Math.round(h)}px`;
+        wordRef.current.style.transformOrigin = '50% 50%';
       }
     }
 
     fit();
-    window.addEventListener('resize', fit);
-    return () => window.removeEventListener('resize', fit);
+    window.addEventListener('resize', fit, { passive: true });
+    window.addEventListener('orientationchange', fit, { passive: true });
+    return () => {
+      window.removeEventListener('resize', fit);
+      window.removeEventListener('orientationchange', fit);
+    };
   }, []);
 
   // 2. Early gatekeeper: Disallow early exit while handwriting is drawing
@@ -151,9 +193,14 @@ export default function IOSWelcomeScreen({ onEnter }) {
 
   return (
     <div
-      className="fixed inset-0 z-[100] w-screen h-screen overflow-hidden select-none cursor-default"
-      style={{ backgroundColor: '#133023' }}
+      className="fixed inset-0 z-[100] w-full h-full h-[100dvh] overflow-hidden select-none cursor-default touch-none overscroll-none"
+      style={{
+        backgroundColor: '#133023',
+        paddingTop: 'env(safe-area-inset-top, 0px)',
+        paddingBottom: 'env(safe-area-inset-bottom, 0px)'
+      }}
       onClick={handleProceed}
+      onTouchEnd={handleProceed}
       onMouseMove={handleMouseMove}
     >
       {/* Living Background Stage: Calm, soothing deep forest green with Apple-style living motion */}
@@ -206,19 +253,19 @@ export default function IOSWelcomeScreen({ onEnter }) {
         />
       </div>
 
-      {/* Word container scaled & positioned to exact crop */}
+      {/* Word container scaled & positioned to exact crop with gentle organic float on mobile */}
       <div
         ref={wordRef}
         id="word"
-        className="absolute pointer-events-none z-10 transition-transform duration-300 ease-out will-change-transform"
+        className="absolute pointer-events-none z-10 transition-transform duration-300 ease-out will-change-transform animate-ios-word-float"
       >
         {/* Pure, Normal Solid White Handwriting - ZERO glow, ZERO blur, crisp and natural */}
         <svg
           id="ink"
           viewBox="0 0 582 286"
-          preserveAspectRatio="none"
+          preserveAspectRatio="xMidYMid meet"
           aria-hidden="true"
-          className="absolute inset-0 w-full h-full"
+          className="w-full h-full block"
           style={{
             transition: 'opacity .5s ease'
           }}
