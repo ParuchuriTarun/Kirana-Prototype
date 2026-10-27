@@ -151,7 +151,8 @@ export default function IOSWelcomeScreen({ onEnter }) {
 
   return (
     <div
-      className="fixed inset-0 z-[100] w-screen h-screen overflow-hidden select-none bg-[#133023] cursor-default"
+      className="fixed inset-0 z-[100] w-screen h-screen overflow-hidden select-none cursor-default"
+      style={{ backgroundColor: '#133023' }}
       onClick={handleProceed}
       onMouseMove={handleMouseMove}
     >
@@ -170,7 +171,8 @@ export default function IOSWelcomeScreen({ onEnter }) {
 
         {/* 2. Soft Green Harmonizer: soothing matte forest overlay */}
         <div
-          className="absolute inset-0 bg-[#1b4332]/25 pointer-events-none"
+          className="absolute inset-0 pointer-events-none"
+          style={{ backgroundColor: 'rgba(27, 67, 50, 0.25)' }}
         />
 
         {/* 3. Living Fluid Aurora Canvas: Gentle natural liquid wave motion (hardware alpha composited) */}
