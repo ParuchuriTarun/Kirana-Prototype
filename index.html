@@ -14,6 +14,15 @@
   </head>
   <body class="bg-surface-50 text-neutral-900 antialiased selection:bg-brand-100 selection:text-brand-950">
     <div id="root"></div>
+    <script>
+      (function() {
+        var redirect = sessionStorage.redirect;
+        delete sessionStorage.redirect;
+        if (redirect && redirect !== location.href) {
+          history.replaceState(null, null, redirect);
+        }
+      })();
+    </script>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
