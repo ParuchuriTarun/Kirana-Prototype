@@ -10,27 +10,17 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Borel&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet">
-    <link rel="preload" as="image" href="/ios-welcome-bg2.jpg" fetchpriority="high">
+    <link rel="preload" as="image" href="./ios-welcome-bg2.jpg" fetchpriority="high">
+    <link rel="stylesheet" crossorigin href="./assets/index-BuKrFS5T.css">
+    <script type="module" crossorigin src="./assets/index-CrXGMFnq.js"></script>
   </head>
   <body class="bg-surface-50 text-neutral-900 antialiased selection:bg-brand-100 selection:text-brand-950">
     <div id="root"></div>
-    <script>
-      (function() {
-        var redirect = sessionStorage.redirect;
-        delete sessionStorage.redirect;
-        if (redirect && redirect !== location.href) {
-          history.replaceState(null, null, redirect);
-        }
-      })();
-    </script>
-    <script>
-      // Automatic fallback for static GitHub Pages root deployment:
-      // Redirect to the pre-compiled production build if not on localhost
-      if (location.hostname !== 'localhost' && location.hostname !== '127.0.0.1' && !location.pathname.includes('/docs')) {
-        var prefix = location.pathname.endsWith('/') ? location.pathname : location.pathname + '/';
-        location.replace(prefix + 'docs/' + location.search + location.hash);
+    <script type="module">
+      // In local development under Vite, load the reactive source modules
+      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        import('/src/main.jsx');
       }
     </script>
-    <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

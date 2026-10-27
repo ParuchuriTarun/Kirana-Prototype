@@ -6,6 +6,7 @@ import {
   WELCOME_STROKE_SEGMENTS
 } from '../constants/welcomeStrokes';
 import { initAuroraCanvas } from '../utils/auroraCanvas';
+import iosWelcomeBg from '../assets/ios-welcome-bg2.jpg';
 
 export default function IOSWelcomeScreen({ onEnter }) {
   const wordRef = useRef(null);
@@ -150,47 +151,50 @@ export default function IOSWelcomeScreen({ onEnter }) {
 
   return (
     <div
-      className="fixed inset-0 z-[100] w-screen h-screen overflow-hidden select-none bg-[#133023] cursor-default"
+      className="fixed inset-0 z-[100] w-screen h-screen overflow-hidden select-none bg-[#021d12] cursor-default"
       onClick={handleProceed}
       onMouseMove={handleMouseMove}
     >
-      {/* Living Background Stage: Decent, soothing natural green with smooth living motion */}
-      <div className="absolute -inset-[8%] w-[116%] h-[116%] overflow-hidden pointer-events-none transform-gpu">
-        {/* 1. Base Apple Wallpaper with gentle floating motion - hue-rotated and desaturated to a calm, decent green */}
+      {/* Living Background Stage: Apple Style Silk Motion Wallpaper */}
+      <div className="absolute -inset-[10%] w-[120%] h-[120%] overflow-hidden pointer-events-none transform-gpu">
+        {/* 1. Base Apple Wallpaper with gentle breathing motion */}
         <img
           id="bg"
           alt=""
-          src="/ios-welcome-bg2.jpg"
+          src={iosWelcomeBg}
           loading="eager"
           decoding="async"
           fetchpriority="high"
-          className="absolute inset-0 w-full h-full object-cover object-center animate-ios-bg-float pointer-events-none select-none will-change-transform brightness-[0.92] contrast-[0.96] saturate-[0.72] hue-rotate-[24deg]"
+          className="absolute inset-0 w-full h-full object-cover object-center animate-ios-bg-float pointer-events-none select-none will-change-transform brightness-[1.02] contrast-[1.04]"
         />
 
-        {/* 2. Soft Green Harmonizer: standard hardware alpha overlay (zero GPU blend stall) */}
-        <div
-          className="absolute inset-0 bg-[#1b4332]/25 pointer-events-none"
-        />
-
-        {/* 3. Living Fluid Aurora Canvas: Gentle natural liquid wave motion (hardware alpha composited) */}
+        {/* 2. Living Fluid Aurora Canvas: Organic silk liquid ribbons */}
         <canvas
           ref={canvasRef}
-          className="absolute inset-0 w-full h-full object-cover opacity-45 pointer-events-none transform-gpu"
+          className="absolute inset-0 w-full h-full object-cover opacity-65 mix-blend-screen pointer-events-none transform-gpu"
         />
 
-        {/* 4. Subtle Living Ambient Drift: Soft, non-vibrant depth (GPU hardware animated) */}
+        {/* 3. Luminous Living Ambient Drift: Glowing Apple Aurora orbs */}
         <div
-          className="absolute -inset-[10%] w-[120%] h-[120%] rounded-full opacity-35 animate-aurora-sweep pointer-events-none transform-gpu"
+          className="absolute -inset-[15%] w-[130%] h-[130%] rounded-full opacity-45 animate-aurora-sweep pointer-events-none transform-gpu mix-blend-screen"
           style={{
-            background: 'radial-gradient(ellipse at 40% 40%, rgba(45, 95, 70, 0.3) 0%, rgba(32, 75, 55, 0.15) 50%, transparent 75%)'
+            background: 'radial-gradient(ellipse at 35% 35%, rgba(52, 211, 153, 0.40) 0%, rgba(16, 185, 129, 0.20) 45%, transparent 75%)'
           }}
         />
 
-        {/* 5. Gentle Edge Softening: Clean, subtle framing */}
+        {/* 4. Second Living Ambient Orb for organic depth */}
+        <div
+          className="absolute -inset-[10%] w-[120%] h-[120%] rounded-full opacity-35 animate-aurora-pulse pointer-events-none transform-gpu mix-blend-screen"
+          style={{
+            background: 'radial-gradient(ellipse at 65% 70%, rgba(110, 231, 183, 0.35) 0%, rgba(5, 150, 105, 0.20) 50%, transparent 80%)'
+          }}
+        />
+
+        {/* 5. Apple Vignette: subtle edge depth */}
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
-            background: 'radial-gradient(ellipse at 50% 50%, transparent 70%, rgba(20, 50, 36, 0.10) 100%)'
+            background: 'radial-gradient(ellipse at 50% 50%, transparent 65%, rgba(2, 29, 18, 0.45) 100%)'
           }}
         />
       </div>
