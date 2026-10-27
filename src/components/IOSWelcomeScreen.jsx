@@ -151,13 +151,13 @@ export default function IOSWelcomeScreen({ onEnter }) {
 
   return (
     <div
-      className="fixed inset-0 z-[100] w-screen h-screen overflow-hidden select-none bg-[#021d12] cursor-default"
+      className="fixed inset-0 z-[100] w-screen h-screen overflow-hidden select-none bg-[#133023] cursor-default"
       onClick={handleProceed}
       onMouseMove={handleMouseMove}
     >
-      {/* Living Background Stage: Apple Style Silk Motion Wallpaper */}
-      <div className="absolute -inset-[10%] w-[120%] h-[120%] overflow-hidden pointer-events-none transform-gpu">
-        {/* 1. Base Apple Wallpaper with gentle breathing motion */}
+      {/* Living Background Stage: Calm, soothing deep forest green with Apple-style living motion */}
+      <div className="absolute -inset-[8%] w-[116%] h-[116%] overflow-hidden pointer-events-none transform-gpu">
+        {/* 1. Base Apple Wallpaper with gentle floating motion - calibrated to the calm, deep matte forest green */}
         <img
           id="bg"
           alt=""
@@ -165,36 +165,41 @@ export default function IOSWelcomeScreen({ onEnter }) {
           loading="eager"
           decoding="async"
           fetchpriority="high"
-          className="absolute inset-0 w-full h-full object-cover object-center animate-ios-bg-float pointer-events-none select-none will-change-transform brightness-[1.02] contrast-[1.04]"
+          className="absolute inset-0 w-full h-full object-cover object-center animate-ios-bg-float pointer-events-none select-none will-change-transform brightness-[0.92] contrast-[0.96] saturate-[0.72] hue-rotate-[24deg]"
         />
 
-        {/* 2. Living Fluid Aurora Canvas: Organic silk liquid ribbons */}
+        {/* 2. Soft Green Harmonizer: soothing matte forest overlay */}
+        <div
+          className="absolute inset-0 bg-[#1b4332]/25 pointer-events-none"
+        />
+
+        {/* 3. Living Fluid Aurora Canvas: Gentle natural liquid wave motion (hardware alpha composited) */}
         <canvas
           ref={canvasRef}
-          className="absolute inset-0 w-full h-full object-cover opacity-65 mix-blend-screen pointer-events-none transform-gpu"
+          className="absolute inset-0 w-full h-full object-cover opacity-50 pointer-events-none transform-gpu"
         />
 
-        {/* 3. Luminous Living Ambient Drift: Glowing Apple Aurora orbs */}
+        {/* 4. Subtle Living Ambient Drift: Soft, non-vibrant depth (GPU hardware animated) */}
         <div
-          className="absolute -inset-[15%] w-[130%] h-[130%] rounded-full opacity-45 animate-aurora-sweep pointer-events-none transform-gpu mix-blend-screen"
+          className="absolute -inset-[10%] w-[120%] h-[120%] rounded-full opacity-35 animate-aurora-sweep pointer-events-none transform-gpu"
           style={{
-            background: 'radial-gradient(ellipse at 35% 35%, rgba(52, 211, 153, 0.40) 0%, rgba(16, 185, 129, 0.20) 45%, transparent 75%)'
+            background: 'radial-gradient(ellipse at 40% 40%, rgba(45, 95, 70, 0.35) 0%, rgba(32, 75, 55, 0.18) 50%, transparent 75%)'
           }}
         />
 
-        {/* 4. Second Living Ambient Orb for organic depth */}
+        {/* 5. Second Ambient Depth Orb: Organic breathing layer in calming pine green */}
         <div
-          className="absolute -inset-[10%] w-[120%] h-[120%] rounded-full opacity-35 animate-aurora-pulse pointer-events-none transform-gpu mix-blend-screen"
+          className="absolute -inset-[8%] w-[116%] h-[116%] rounded-full opacity-25 animate-aurora-pulse pointer-events-none transform-gpu"
           style={{
-            background: 'radial-gradient(ellipse at 65% 70%, rgba(110, 231, 183, 0.35) 0%, rgba(5, 150, 105, 0.20) 50%, transparent 80%)'
+            background: 'radial-gradient(ellipse at 65% 65%, rgba(38, 92, 66, 0.30) 0%, rgba(24, 62, 44, 0.15) 50%, transparent 80%)'
           }}
         />
 
-        {/* 5. Apple Vignette: subtle edge depth */}
+        {/* 6. Gentle Edge Softening: Clean, subtle framing */}
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
-            background: 'radial-gradient(ellipse at 50% 50%, transparent 65%, rgba(2, 29, 18, 0.45) 100%)'
+            background: 'radial-gradient(ellipse at 50% 50%, transparent 70%, rgba(18, 46, 32, 0.25) 100%)'
           }}
         />
       </div>

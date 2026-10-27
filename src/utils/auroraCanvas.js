@@ -1,5 +1,5 @@
-// 60FPS Ultra-Smooth High-Performance Apple Silk Aurora Motion
-// Vibrant, flowing liquid ribbons calibrated to Apple's signature emerald & lime silk palette
+// 60FPS Ultra-Smooth High-Performance Deep Forest Green Liquid Motion
+// Calibrated to soothing, deep natural forest & pine green (#183a2a / #1a402e)
 export function initAuroraCanvas(canvas) {
   if (!canvas) return () => {};
   const ctx = canvas.getContext('2d', { alpha: true });
@@ -11,13 +11,13 @@ export function initAuroraCanvas(canvas) {
   const width = (canvas.width = 480);
   const height = (canvas.height = 270);
 
-  // Vibrant, luminous Apple green silk tones
+  // Deep, soothing, natural forest & pine green tones (calm, elegant, never harsh or neon)
   const nodes = [
-    { x: 0.20, y: 0.25, sx: 0.8, sy: 0.7, rx: 0.25, ry: 0.22, color: [52, 211, 153],  alpha: 0.40 }, // Luminous emerald glow
-    { x: 0.78, y: 0.68, sx: 0.7, sy: 0.9, rx: 0.26, ry: 0.24, color: [16, 185, 129], alpha: 0.45 }, // Vibrant jade silk
-    { x: 0.65, y: 0.22, sx: 0.9, sy: 0.8, rx: 0.22, ry: 0.25, color: [167, 243, 208], alpha: 0.35 }, // Mint highlight ribbon
-    { x: 0.25, y: 0.75, sx: 0.7, sy: 1.0, rx: 0.28, ry: 0.22, color: [5, 150, 105],  alpha: 0.38 }, // Deep emerald depth
-    { x: 0.50, y: 0.48, sx: 1.0, sy: 0.9, rx: 0.20, ry: 0.18, color: [190, 242, 100], alpha: 0.30 }  // Luminous lime accent
+    { x: 0.20, y: 0.25, sx: 0.8, sy: 0.7, rx: 0.25, ry: 0.22, color: [32, 80, 56],  alpha: 0.32 }, // Calm deep forest
+    { x: 0.78, y: 0.68, sx: 0.7, sy: 0.9, rx: 0.26, ry: 0.24, color: [26, 68, 48],  alpha: 0.36 }, // Soft pine
+    { x: 0.65, y: 0.22, sx: 0.9, sy: 0.8, rx: 0.22, ry: 0.25, color: [38, 92, 66],  alpha: 0.28 }, // Balanced sage
+    { x: 0.25, y: 0.75, sx: 0.7, sy: 1.0, rx: 0.28, ry: 0.22, color: [24, 62, 44],  alpha: 0.30 }, // Muted moss
+    { x: 0.50, y: 0.48, sx: 1.0, sy: 0.9, rx: 0.20, ry: 0.18, color: [35, 86, 60],  alpha: 0.26 }  // Gentle core forest green
   ];
 
   const startTime = performance.now();
@@ -36,15 +36,15 @@ export function initAuroraCanvas(canvas) {
       const grad = ctx.createRadialGradient(curX, curY, 0, curX, curY, Math.max(10, curR));
       const [r, g, b] = n.color;
       grad.addColorStop(0, `rgba(${r}, ${g}, ${b}, ${n.alpha})`);
-      grad.addColorStop(0.40, `rgba(${r}, ${g}, ${b}, ${n.alpha * 0.7})`);
-      grad.addColorStop(0.75, `rgba(${r}, ${g}, ${b}, ${n.alpha * 0.2})`);
+      grad.addColorStop(0.40, `rgba(${r}, ${g}, ${b}, ${n.alpha * 0.65})`);
+      grad.addColorStop(0.75, `rgba(${r}, ${g}, ${b}, ${n.alpha * 0.18})`);
       grad.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`);
 
       ctx.fillStyle = grad;
       ctx.fillRect(0, 0, width, height);
     }
 
-    // 2. Luminous Flowing Wave Ribbons
+    // 2. Gentle Undulating Wave Ribbons (soft, natural motion)
     for (let w = 0; w < 3; w++) {
       ctx.beginPath();
       const baseY = height * (0.28 + w * 0.26);
@@ -52,8 +52,8 @@ export function initAuroraCanvas(canvas) {
 
       const waveSpeed = 1.2 - w * 0.2;
       const waveFreq = 0.012 + w * 0.003;
-      const amp1 = 20 + w * 6;
-      const amp2 = 12 + w * 4;
+      const amp1 = 18 + w * 5;
+      const amp2 = 10 + w * 3;
 
       for (let x = -20; x <= width + 20; x += 16) {
         const y = baseY +
@@ -68,17 +68,17 @@ export function initAuroraCanvas(canvas) {
 
       const grad = ctx.createLinearGradient(0, baseY - 40, width, baseY + 80);
       if (w === 0) {
-        grad.addColorStop(0, 'rgba(167, 243, 208, 0.28)');
-        grad.addColorStop(0.5, 'rgba(52, 211, 153, 0.16)');
-        grad.addColorStop(1, 'rgba(5, 150, 105, 0.0)');
+        grad.addColorStop(0, 'rgba(38, 92, 66, 0.22)');
+        grad.addColorStop(0.5, 'rgba(32, 80, 56, 0.12)');
+        grad.addColorStop(1, 'rgba(24, 62, 44, 0.0)');
       } else if (w === 1) {
-        grad.addColorStop(0, 'rgba(52, 211, 153, 0.24)');
-        grad.addColorStop(0.5, 'rgba(16, 185, 129, 0.12)');
-        grad.addColorStop(1, 'rgba(4, 120, 87, 0.0)');
+        grad.addColorStop(0, 'rgba(32, 80, 56, 0.18)');
+        grad.addColorStop(0.5, 'rgba(26, 68, 48, 0.09)');
+        grad.addColorStop(1, 'rgba(20, 54, 38, 0.0)');
       } else {
-        grad.addColorStop(0, 'rgba(110, 231, 183, 0.20)');
-        grad.addColorStop(0.6, 'rgba(16, 185, 129, 0.10)');
-        grad.addColorStop(1, 'rgba(6, 78, 59, 0.0)');
+        grad.addColorStop(0, 'rgba(35, 86, 60, 0.16)');
+        grad.addColorStop(0.6, 'rgba(26, 68, 48, 0.08)');
+        grad.addColorStop(1, 'rgba(18, 48, 34, 0.0)');
       }
 
       ctx.fillStyle = grad;
