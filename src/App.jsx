@@ -117,25 +117,7 @@ export default function App() {
     }
   }, [cartItems]);
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const [welcomeActive, setWelcomeActive] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const hash = window.location.hash;
-      if (hash === '#welcome' || hash === '#/welcome' || window.location.search.includes('welcome')) {
-        return true;
-      }
-      // On fresh load of the home page, play the welcome splash once per session
-      if (!hash || hash === '#/' || hash === '#' || hash === '') {
-        try {
-          const hasSeen = sessionStorage.getItem('kirana_seen_welcome');
-          if (!hasSeen) {
-            sessionStorage.setItem('kirana_seen_welcome', 'true');
-            return true;
-          }
-        } catch (_) {}
-      }
-    }
-    return false;
-  });
+  const [welcomeActive, setWelcomeActive] = useState(false);
 
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [loginModalMode, setLoginModalMode] = useState('input');
@@ -205,7 +187,7 @@ export default function App() {
         if (found) {
           setSelectedProduct(found);
         }
-      } else if (hash === '#/welcome' || hash === '#welcome' || window.location.search.includes('welcome')) {
+      } else if (hash === '#/welcome' || hash === '#welcome') {
         setWelcomeActive(true);
       } else {
         setCurrentPage('home');
