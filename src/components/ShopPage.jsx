@@ -710,7 +710,7 @@ export default function ShopPage({
   );
 
   return (
-    <div className="w-full pt-1.5 sm:pt-2 pb-5 sm:pb-6">
+    <div className="w-full pt-1.5 sm:pt-2 pb-24 sm:pb-8">
       <div className="w-[94%] sm:w-[96%] max-w-[1600px] mx-auto px-1 sm:px-3 lg:px-4">
 
         {/* Mobile Filter Toggle Header Bar (Visible on < lg) */}

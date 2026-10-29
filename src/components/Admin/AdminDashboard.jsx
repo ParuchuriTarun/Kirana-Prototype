@@ -580,47 +580,50 @@ export default function AdminDashboard({ onNavigateToStore, showNotice }) {
 
       {/* ===================== TOP ADMIN HEADER ===================== */}
       <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-2xl border-b border-emerald-100 shadow-[0_4px_20px_rgba(5,150,105,0.06)]">
-        <div className="w-[96%] max-w-[1600px] mx-auto px-2 sm:px-4 py-3.5 flex items-center justify-between gap-4">
+        <div className="w-[94%] sm:w-[96%] max-w-[1600px] mx-auto px-1 sm:px-4 py-2.5 sm:py-3.5 flex items-center justify-between gap-2 sm:gap-4">
           
           {/* Logo & Portal Title */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
             <motion.div 
               whileHover={{ rotate: 6, scale: 1.06 }}
               transition={{ type: "spring", stiffness: 400, damping: 25 }}
-              className="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-500 text-white flex items-center justify-center font-bold shadow-md shadow-emerald-600/20"
+              className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-500 text-white flex items-center justify-center font-bold shadow-md shadow-emerald-600/20 shrink-0"
             >
-              <ShieldCheck className="w-5 h-5 text-white" />
+              <ShieldCheck className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
             </motion.div>
-            <div>
-              <div className="flex items-center gap-2.5">
-                <span className="font-extrabold text-base sm:text-lg tracking-tight text-black font-sans">
-                  Kirana Master Admin
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5 sm:gap-2.5">
+                <span className="font-extrabold text-sm sm:text-lg tracking-tight text-black font-sans truncate">
+                  <span className="sm:hidden">Kirana Admin</span>
+                  <span className="hidden sm:inline">Kirana Master Admin</span>
                 </span>
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-[10px] font-extrabold border border-emerald-200 shadow-2xs">
+                <span className="inline-flex items-center gap-1 sm:gap-1.5 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-[9px] sm:text-[10px] font-extrabold border border-emerald-200 shadow-2xs shrink-0">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                  Live Sync
+                  <span>Sync</span>
                 </span>
               </div>
-              <p className="text-[11px] text-neutral-600 hidden sm:block font-medium">
-                Centralized Control: Slides, Products, Stock, Real-Time Sessions & CRM
+              <p className="text-[11px] text-neutral-600 hidden md:block font-medium">
+                Centralized Control: Slides, Products, Stock, Real-Time Sessions &amp; CRM
               </p>
             </div>
           </div>
 
           {/* Quick Info & Action Buttons */}
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
             {/* Live Online Logins Badge with White -> Green hover */}
             <motion.button
               type="button"
               onClick={() => setActiveTab('sessions')}
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
-              className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white hover:bg-emerald-600 text-black hover:text-white border border-emerald-300 hover:border-emerald-600 text-xs font-bold cursor-pointer transition-all duration-200 shadow-sm group"
+              className="flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-full bg-white hover:bg-emerald-600 text-black hover:text-white border border-emerald-300 hover:border-emerald-600 text-[11px] sm:text-xs font-bold cursor-pointer transition-all duration-200 shadow-sm group"
               title="Click to view all logged-in users"
             >
-              <Radio className="w-3.5 h-3.5 text-emerald-600 group-hover:text-white animate-pulse transition-colors" />
-              <span>{activeOnlineCount} Logged In Online</span>
+              <Radio className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-emerald-600 group-hover:text-white animate-pulse transition-colors" />
+              <span>{activeOnlineCount}</span>
+              <span className="hidden sm:inline">Logged In Online</span>
+              <span className="sm:hidden">Live</span>
             </motion.button>
 
             {/* Back to Live Store Button */}
@@ -630,11 +633,12 @@ export default function AdminDashboard({ onNavigateToStore, showNotice }) {
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
               transition={{ type: "spring", stiffness: 400, damping: 25 }}
-              className="flex items-center gap-1.5 px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-full shadow-md shadow-emerald-600/25 cursor-pointer transition-all duration-200"
+              className="flex items-center gap-1 sm:gap-1.5 px-3 sm:px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] sm:text-xs font-bold rounded-full shadow-md shadow-emerald-600/25 cursor-pointer transition-all duration-200"
             >
-              <Store className="w-3.5 h-3.5" />
-              <span>View Store</span>
-              <ArrowUpRight className="w-3.5 h-3.5 stroke-[2.5]" />
+              <Store className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+              <span className="hidden xs:inline">View Store</span>
+              <span className="xs:hidden">Store</span>
+              <ArrowUpRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 stroke-[2.5]" />
             </motion.button>
           </div>
         </div>
@@ -701,34 +705,34 @@ export default function AdminDashboard({ onNavigateToStore, showNotice }) {
             className="space-y-6"
           >
             
-            {/* Top 4 KPI Metric Cards: White becoming Green & Black becoming White on Hover */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Top 4 KPI Metric Cards: 2x2 on Mobile, 4 columns on Desktop */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
               
               {/* Metric 1: Live Logged-in Users */}
               <motion.div 
                 variants={fadeCardVariant}
                 whileHover={{ y: -5, scale: 1.02 }}
                 transition={{ type: "spring", stiffness: 350, damping: 25 }}
-                className="bg-white hover:bg-emerald-600 text-black hover:text-white rounded-[26px] p-5 border border-emerald-200 hover:border-emerald-600 shadow-[0_4px_24px_rgba(5,150,105,0.06)] hover:shadow-[0_16px_36px_rgba(5,150,105,0.3)] transition-all duration-300 relative overflow-hidden group cursor-pointer"
+                className="bg-white hover:bg-emerald-600 text-black hover:text-white rounded-[20px] sm:rounded-[26px] p-3.5 sm:p-5 border border-emerald-200 hover:border-emerald-600 shadow-[0_4px_24px_rgba(5,150,105,0.06)] hover:shadow-[0_16px_36px_rgba(5,150,105,0.3)] transition-all duration-300 relative overflow-hidden group cursor-pointer"
               >
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-[11px] font-extrabold uppercase tracking-widest text-neutral-600 group-hover:text-white transition-colors duration-200">
-                    People Logged In
+                <div className="flex items-center justify-between mb-2 sm:mb-3">
+                  <span className="text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider text-neutral-600 group-hover:text-white transition-colors duration-200 truncate pr-1">
+                    Logged In
                   </span>
-                  <div className="w-8 h-8 rounded-xl bg-emerald-50 group-hover:bg-white text-emerald-700 group-hover:text-emerald-700 flex items-center justify-center shadow-xs transition-colors duration-200">
-                    <Radio className="w-4 h-4 animate-pulse" />
+                  <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-emerald-50 group-hover:bg-white text-emerald-700 group-hover:text-emerald-700 flex items-center justify-center shadow-xs transition-colors duration-200 shrink-0">
+                    <Radio className="w-3.5 h-3.5 animate-pulse" />
                   </div>
                 </div>
-                <div className="flex items-baseline gap-2.5">
-                  <span className="text-3xl sm:text-4xl font-extrabold text-black group-hover:text-white tracking-tight transition-colors duration-200">
+                <div className="flex flex-wrap items-baseline gap-1.5 sm:gap-2.5">
+                  <span className="text-2xl sm:text-4xl font-extrabold text-black group-hover:text-white tracking-tight transition-colors duration-200">
                     <GsapCounter value={activeOnlineCount} />
                   </span>
-                  <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 group-hover:bg-white text-emerald-800 group-hover:text-emerald-800 border border-emerald-200 group-hover:border-white transition-colors duration-200 shadow-2xs">
-                    Active Right Now
+                  <span className="text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-100 group-hover:bg-white text-emerald-800 group-hover:text-emerald-800 border border-emerald-200 group-hover:border-white transition-colors duration-200 shadow-2xs">
+                    Live
                   </span>
                 </div>
-                <p className="text-[11px] text-neutral-600 group-hover:text-emerald-100 mt-2 font-medium transition-colors duration-200">
-                  {sessions.length} total active browser sessions recorded
+                <p className="text-[10px] sm:text-[11px] text-neutral-600 group-hover:text-emerald-100 mt-1.5 sm:mt-2 font-medium transition-colors duration-200 truncate">
+                  {sessions.length} sessions recorded
                 </p>
               </motion.div>
 
@@ -737,26 +741,26 @@ export default function AdminDashboard({ onNavigateToStore, showNotice }) {
                 variants={fadeCardVariant}
                 whileHover={{ y: -5, scale: 1.02 }}
                 transition={{ type: "spring", stiffness: 350, damping: 25 }}
-                className="bg-white hover:bg-emerald-600 text-black hover:text-white rounded-[26px] p-5 border border-emerald-200 hover:border-emerald-600 shadow-[0_4px_24px_rgba(5,150,105,0.06)] hover:shadow-[0_16px_36px_rgba(5,150,105,0.3)] transition-all duration-300 relative overflow-hidden group cursor-pointer"
+                className="bg-white hover:bg-emerald-600 text-black hover:text-white rounded-[20px] sm:rounded-[26px] p-3.5 sm:p-5 border border-emerald-200 hover:border-emerald-600 shadow-[0_4px_24px_rgba(5,150,105,0.06)] hover:shadow-[0_16px_36px_rgba(5,150,105,0.3)] transition-all duration-300 relative overflow-hidden group cursor-pointer"
               >
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-[11px] font-extrabold uppercase tracking-widest text-neutral-600 group-hover:text-white transition-colors duration-200">
-                    Active Catalog
+                <div className="flex items-center justify-between mb-2 sm:mb-3">
+                  <span className="text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider text-neutral-600 group-hover:text-white transition-colors duration-200 truncate pr-1">
+                    Catalog
                   </span>
-                  <div className="w-8 h-8 rounded-xl bg-emerald-50 group-hover:bg-white text-emerald-700 group-hover:text-emerald-700 flex items-center justify-center shadow-xs transition-colors duration-200">
-                    <Package className="w-4 h-4" />
+                  <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-emerald-50 group-hover:bg-white text-emerald-700 group-hover:text-emerald-700 flex items-center justify-center shadow-xs transition-colors duration-200 shrink-0">
+                    <Package className="w-3.5 h-3.5" />
                   </div>
                 </div>
-                <div className="flex items-baseline gap-2.5">
-                  <span className="text-3xl sm:text-4xl font-extrabold text-black group-hover:text-white tracking-tight transition-colors duration-200">
+                <div className="flex flex-wrap items-baseline gap-1.5 sm:gap-2.5">
+                  <span className="text-2xl sm:text-4xl font-extrabold text-black group-hover:text-white tracking-tight transition-colors duration-200">
                     <GsapCounter value={products.length} />
                   </span>
-                  <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 group-hover:bg-white text-emerald-800 group-hover:text-emerald-800 border border-emerald-200 group-hover:border-white transition-colors duration-200 shadow-2xs">
-                    Live Items
+                  <span className="text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-100 group-hover:bg-white text-emerald-800 group-hover:text-emerald-800 border border-emerald-200 group-hover:border-white transition-colors duration-200 shadow-2xs">
+                    Items
                   </span>
                 </div>
-                <p className="text-[11px] text-neutral-600 group-hover:text-emerald-100 mt-2 font-medium transition-colors duration-200">
-                  Across 7 curated grocery departments
+                <p className="text-[10px] sm:text-[11px] text-neutral-600 group-hover:text-emerald-100 mt-1.5 sm:mt-2 font-medium transition-colors duration-200 truncate">
+                  7 store departments
                 </p>
               </motion.div>
 
@@ -765,41 +769,36 @@ export default function AdminDashboard({ onNavigateToStore, showNotice }) {
                 variants={fadeCardVariant}
                 whileHover={{ y: -5, scale: 1.02 }}
                 transition={{ type: "spring", stiffness: 350, damping: 25 }}
-                className="bg-white hover:bg-emerald-600 text-black hover:text-white rounded-[26px] p-5 border border-emerald-200 hover:border-emerald-600 shadow-[0_4px_24px_rgba(5,150,105,0.06)] hover:shadow-[0_16px_36px_rgba(5,150,105,0.3)] transition-all duration-300 relative overflow-hidden group cursor-pointer"
+                className="bg-white hover:bg-emerald-600 text-black hover:text-white rounded-[20px] sm:rounded-[26px] p-3.5 sm:p-5 border border-emerald-200 hover:border-emerald-600 shadow-[0_4px_24px_rgba(5,150,105,0.06)] hover:shadow-[0_16px_36px_rgba(5,150,105,0.3)] transition-all duration-300 relative overflow-hidden group cursor-pointer"
               >
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-[11px] font-extrabold uppercase tracking-widest text-neutral-600 group-hover:text-white transition-colors duration-200">
-                    Stock Available
+                <div className="flex items-center justify-between mb-2 sm:mb-3">
+                  <span className="text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider text-neutral-600 group-hover:text-white transition-colors duration-200 truncate pr-1">
+                    Stock
                   </span>
-                  <div className="w-8 h-8 rounded-xl bg-emerald-50 group-hover:bg-white text-emerald-700 group-hover:text-emerald-700 flex items-center justify-center shadow-xs transition-colors duration-200">
-                    <Boxes className="w-4 h-4" />
+                  <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-emerald-50 group-hover:bg-white text-emerald-700 group-hover:text-emerald-700 flex items-center justify-center shadow-xs transition-colors duration-200 shrink-0">
+                    <Boxes className="w-3.5 h-3.5" />
                   </div>
                 </div>
-                <div className="flex items-baseline gap-2.5">
-                  <span className="text-3xl sm:text-4xl font-extrabold text-black group-hover:text-white tracking-tight transition-colors duration-200">
+                <div className="flex flex-wrap items-baseline gap-1.5 sm:gap-2.5">
+                  <span className="text-2xl sm:text-4xl font-extrabold text-black group-hover:text-white tracking-tight transition-colors duration-200">
                     <GsapCounter value={totalStockUnits} />
                   </span>
-                  <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 group-hover:bg-white text-emerald-800 group-hover:text-emerald-800 border border-emerald-200 group-hover:border-white transition-colors duration-200 shadow-2xs">
-                    Units in Warehouse
+                  <span className="text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-100 group-hover:bg-white text-emerald-800 group-hover:text-emerald-800 border border-emerald-200 group-hover:border-white transition-colors duration-200 shadow-2xs">
+                    Units
                   </span>
                 </div>
-                <p className="text-[11px] text-neutral-600 group-hover:text-emerald-100 mt-2 flex items-center gap-2 font-medium transition-colors duration-200">
-                  {outOfStockCount > 0 && (
-                    <span className="text-rose-600 group-hover:text-rose-200 font-bold flex items-center gap-1 transition-colors">
-                      <span className="w-1.5 h-1.5 rounded-full bg-rose-500 group-hover:bg-white" />
+                <p className="text-[10px] sm:text-[11px] text-neutral-600 group-hover:text-emerald-100 mt-1.5 sm:mt-2 font-medium transition-colors duration-200 truncate">
+                  {outOfStockCount > 0 ? (
+                    <span className="text-rose-600 group-hover:text-rose-200 font-bold">
                       {outOfStockCount} Out of stock
                     </span>
-                  )}
-                  {lowStockCount > 0 && (
-                    <span className="text-amber-700 group-hover:text-amber-200 font-bold flex items-center gap-1 transition-colors">
-                      <span className="w-1.5 h-1.5 rounded-full bg-amber-500 group-hover:bg-white" />
+                  ) : lowStockCount > 0 ? (
+                    <span className="text-amber-700 group-hover:text-amber-200 font-bold">
                       {lowStockCount} Low stock
                     </span>
-                  )}
-                  {outOfStockCount === 0 && lowStockCount === 0 && (
-                    <span className="text-emerald-700 group-hover:text-white font-bold flex items-center gap-1 transition-colors">
-                      <Check className="w-3.5 h-3.5" />
-                      100% Stock Healthy
+                  ) : (
+                    <span className="text-emerald-700 group-hover:text-white font-bold">
+                      Healthy stock
                     </span>
                   )}
                 </p>
@@ -810,25 +809,25 @@ export default function AdminDashboard({ onNavigateToStore, showNotice }) {
                 variants={fadeCardVariant}
                 whileHover={{ y: -5, scale: 1.02 }}
                 transition={{ type: "spring", stiffness: 350, damping: 25 }}
-                className="bg-white hover:bg-emerald-600 text-black hover:text-white rounded-[26px] p-5 border border-emerald-200 hover:border-emerald-600 shadow-[0_4px_24px_rgba(5,150,105,0.06)] hover:shadow-[0_16px_36px_rgba(5,150,105,0.3)] transition-all duration-300 relative overflow-hidden group cursor-pointer"
+                className="bg-white hover:bg-emerald-600 text-black hover:text-white rounded-[20px] sm:rounded-[26px] p-3.5 sm:p-5 border border-emerald-200 hover:border-emerald-600 shadow-[0_4px_24px_rgba(5,150,105,0.06)] hover:shadow-[0_16px_36px_rgba(5,150,105,0.3)] transition-all duration-300 relative overflow-hidden group cursor-pointer"
               >
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-[11px] font-extrabold uppercase tracking-widest text-neutral-600 group-hover:text-white transition-colors duration-200">
-                    Total Customers
+                <div className="flex items-center justify-between mb-2 sm:mb-3">
+                  <span className="text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider text-neutral-600 group-hover:text-white transition-colors duration-200 truncate pr-1">
+                    Customers
                   </span>
-                  <div className="w-8 h-8 rounded-xl bg-emerald-50 group-hover:bg-white text-emerald-700 group-hover:text-emerald-700 flex items-center justify-center shadow-xs transition-colors duration-200">
-                    <Users className="w-4 h-4" />
+                  <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-emerald-50 group-hover:bg-white text-emerald-700 group-hover:text-emerald-700 flex items-center justify-center shadow-xs transition-colors duration-200 shrink-0">
+                    <Users className="w-3.5 h-3.5" />
                   </div>
                 </div>
-                <div className="flex items-baseline gap-2.5">
-                  <span className="text-3xl sm:text-4xl font-extrabold text-black group-hover:text-white tracking-tight transition-colors duration-200">
+                <div className="flex flex-wrap items-baseline gap-1.5 sm:gap-2.5">
+                  <span className="text-2xl sm:text-4xl font-extrabold text-black group-hover:text-white tracking-tight transition-colors duration-200">
                     <GsapCounter value={Array.isArray(customers) ? customers.length : 0} />
                   </span>
-                  <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 group-hover:bg-white text-emerald-800 group-hover:text-emerald-800 border border-emerald-200 group-hover:border-white transition-colors duration-200 shadow-2xs">
-                    Profiles
+                  <span className="text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-100 group-hover:bg-white text-emerald-800 group-hover:text-emerald-800 border border-emerald-200 group-hover:border-white transition-colors duration-200 shadow-2xs">
+                    Users
                   </span>
                 </div>
-                <p className="text-[11px] text-neutral-600 group-hover:text-emerald-100 mt-2 font-medium transition-colors duration-200">
+                <p className="text-[10px] sm:text-[11px] text-neutral-600 group-hover:text-emerald-100 mt-1.5 sm:mt-2 font-medium transition-colors duration-200 truncate">
                   ₹{(Array.isArray(customers) ? customers.reduce((s, c) => s + (Number(c?.totalSpent) || 0), 0) : 0).toLocaleString('en-IN')} Lifetime Orders Value
                 </p>
               </motion.div>
@@ -837,9 +836,9 @@ export default function AdminDashboard({ onNavigateToStore, showNotice }) {
             {/* Quick Actions & Control Center */}
             <motion.div 
               variants={fadeCardVariant}
-              className="bg-white rounded-[28px] p-6 border border-emerald-100 shadow-[0_4px_30px_rgba(5,150,105,0.06)]"
+              className="bg-white rounded-[22px] sm:rounded-[28px] p-4 sm:p-6 border border-emerald-100 shadow-[0_4px_30px_rgba(5,150,105,0.06)]"
             >
-              <div className="flex items-center justify-between pb-4 mb-5 border-b border-emerald-100">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3.5 sm:pb-4 mb-4 sm:mb-5 border-b border-emerald-100">
                 <div>
                   <h2 className="text-base sm:text-lg font-extrabold text-black">Quick Store Controls</h2>
                   <p className="text-xs text-neutral-600 mt-0.5">Fast shortcuts to manage all 5 core elements of Kirana</p>
@@ -849,7 +848,7 @@ export default function AdminDashboard({ onNavigateToStore, showNotice }) {
                   onClick={promptFactoryReset}
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
-                  className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold bg-white hover:bg-emerald-600 text-black hover:text-white border border-emerald-200 hover:border-emerald-600 rounded-xl transition-all cursor-pointer shadow-2xs group"
+                  className="self-start sm:self-auto flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 text-xs font-bold bg-white hover:bg-emerald-600 text-black hover:text-white border border-emerald-200 hover:border-emerald-600 rounded-xl transition-all cursor-pointer shadow-2xs group"
                   title="Reset demo data"
                 >
                   <RotateCcw className="w-3.5 h-3.5 text-emerald-700 group-hover:text-white transition-colors" />
@@ -857,8 +856,8 @@ export default function AdminDashboard({ onNavigateToStore, showNotice }) {
                 </motion.button>
               </div>
 
-              {/* 5 Quick Control Action Cards: White to Green & Black to White on Hover */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
+              {/* 5 Quick Control Action Cards: 2-column on Mobile, 5-column on Desktop */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-3.5">
                 {[
                   {
                     title: 'Add Carousel Slide',
@@ -902,6 +901,7 @@ export default function AdminDashboard({ onNavigateToStore, showNotice }) {
                   }
                 ].map((item, idx) => {
                   const Icon = item.icon;
+                  const isLastOdd = idx === 4;
                   return (
                     <motion.button
                       key={idx}
@@ -910,13 +910,15 @@ export default function AdminDashboard({ onNavigateToStore, showNotice }) {
                       whileHover={{ y: -5, scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                      className="p-4 rounded-2xl bg-white hover:bg-emerald-600 text-black hover:text-white border border-emerald-200 hover:border-emerald-600 transition-all duration-200 text-left group cursor-pointer shadow-xs hover:shadow-lg hover:shadow-emerald-600/20"
+                      className={`p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-white hover:bg-emerald-600 text-black hover:text-white border border-emerald-200 hover:border-emerald-600 transition-all duration-200 text-left group cursor-pointer shadow-xs hover:shadow-lg hover:shadow-emerald-600/20 ${
+                        isLastOdd ? 'col-span-2 sm:col-span-1' : ''
+                      }`}
                     >
-                      <div className="w-9 h-9 rounded-xl bg-emerald-50 group-hover:bg-white text-emerald-700 group-hover:text-emerald-700 border border-emerald-200 group-hover:border-white flex items-center justify-center shadow-xs mb-3 group-hover:scale-110 transition-all duration-200">
-                        <Icon className={`w-4 h-4 ${item.pulse ? 'animate-pulse' : ''}`} />
+                      <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-emerald-50 group-hover:bg-white text-emerald-700 group-hover:text-emerald-700 border border-emerald-200 group-hover:border-white flex items-center justify-center shadow-xs mb-2 sm:mb-3 group-hover:scale-110 transition-all duration-200">
+                        <Icon className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${item.pulse ? 'animate-pulse' : ''}`} />
                       </div>
-                      <h3 className="text-xs font-extrabold text-black group-hover:text-white transition-colors duration-200">{item.title}</h3>
-                      <p className="text-[11px] text-neutral-600 group-hover:text-emerald-100 mt-1 transition-colors duration-200">{item.desc}</p>
+                      <h3 className="text-[11px] sm:text-xs font-extrabold text-black group-hover:text-white transition-colors duration-200 leading-tight">{item.title}</h3>
+                      <p className="text-[10px] sm:text-[11px] text-neutral-600 group-hover:text-emerald-100 mt-0.5 sm:mt-1 transition-colors duration-200 line-clamp-1">{item.desc}</p>
                     </motion.button>
                   );
                 })}
@@ -929,7 +931,7 @@ export default function AdminDashboard({ onNavigateToStore, showNotice }) {
               {/* Carousel Slides Preview */}
               <motion.div 
                 variants={fadeCardVariant}
-                className="bg-white rounded-[28px] p-6 border border-emerald-100 shadow-[0_4px_30px_rgba(5,150,105,0.06)]"
+                className="bg-white rounded-[22px] sm:rounded-[28px] p-4 sm:p-6 border border-emerald-100 shadow-[0_4px_30px_rgba(5,150,105,0.06)]"
               >
                 <div className="flex items-center justify-between pb-3 mb-4 border-b border-emerald-100">
                   <div className="flex items-center gap-2">
@@ -983,7 +985,7 @@ export default function AdminDashboard({ onNavigateToStore, showNotice }) {
               {/* Real-Time Logged-in Users Preview */}
               <motion.div 
                 variants={fadeCardVariant}
-                className="bg-white rounded-[28px] p-6 border border-emerald-100 shadow-[0_4px_30px_rgba(5,150,105,0.06)]"
+                className="bg-white rounded-[22px] sm:rounded-[28px] p-4 sm:p-6 border border-emerald-100 shadow-[0_4px_30px_rgba(5,150,105,0.06)]"
               >
                 <div className="flex items-center justify-between pb-3 mb-4 border-b border-emerald-100">
                   <div className="flex items-center gap-2">

@@ -382,7 +382,7 @@ export default function OrdersPage({
   };
 
   return (
-    <div className="w-[94%] sm:w-[96%] max-w-[1100px] mx-auto py-4 sm:py-8 space-y-5 sm:space-y-6">
+    <div className="w-[94%] sm:w-[96%] max-w-[1100px] mx-auto py-4 sm:py-8 space-y-5 sm:space-y-6 pb-24 sm:pb-8">
       
       {/* Top Breadcrumb & Navigation Bar */}
       <div className="flex flex-wrap items-center justify-between gap-3 pb-2 border-b border-black/[0.05]">

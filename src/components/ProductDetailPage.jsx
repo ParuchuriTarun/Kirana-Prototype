@@ -106,7 +106,7 @@ export default function ProductDetailPage({
   };
 
   return (
-    <div className="w-[94%] sm:w-[96%] max-w-[1400px] mx-auto px-1 sm:px-4 py-3 sm:py-8 font-sans antialiased text-[#1d1d1f]">
+    <div className="w-[94%] sm:w-[96%] max-w-[1400px] mx-auto px-1 sm:px-4 py-3 sm:py-8 pb-24 sm:pb-8 font-sans antialiased text-[#1d1d1f]">
       
       {/* ==================== BREADCRUMBS & TOP BAR ==================== */}
       <nav aria-label="Breadcrumb" className="flex flex-wrap items-center justify-between gap-3 mb-6">

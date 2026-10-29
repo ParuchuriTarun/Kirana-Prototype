@@ -245,7 +245,7 @@ export default function ProfilePage({
   };
 
   return (
-    <div className="w-[94%] sm:w-[96%] max-w-[1140px] mx-auto py-4 sm:py-9 space-y-5 sm:space-y-6">
+    <div className="w-[94%] sm:w-[96%] max-w-[1140px] mx-auto py-4 sm:py-9 space-y-4 sm:space-y-6 pb-24 sm:pb-8">
       
       {/* Top Breadcrumb & Navigation Bar */}
       <div className="flex flex-wrap items-center justify-between gap-3 pb-2 border-b border-black/[0.06]">
@@ -386,27 +386,27 @@ export default function ProfilePage({
         </div>
 
         {/* ===================== 4-CARD OVERVIEW QUAD-GRID ===================== */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
           {/* Total Orders Card */}
           <motion.div 
             whileHover={{ y: -3 }}
-            className="bg-white rounded-3xl p-5 sm:p-6 border-2 border-neutral-200/90 hover:border-emerald-500/70 shadow-2xs hover:shadow-[0_12px_32px_rgba(5,150,105,0.08)] transition-all duration-200 flex flex-col justify-between group"
+            className="bg-white rounded-2xl sm:rounded-3xl p-3.5 sm:p-6 border-2 border-neutral-200/90 hover:border-emerald-500/70 shadow-2xs hover:shadow-[0_12px_32px_rgba(5,150,105,0.08)] transition-all duration-200 flex flex-col justify-between group"
           >
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider text-neutral-500 group-hover:text-neutral-800 transition-colors">
+              <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-neutral-500 group-hover:text-neutral-800 transition-colors">
                 Total Orders
               </span>
-              <div className="w-10 h-10 rounded-2xl bg-emerald-50 border-2 border-emerald-200/90 text-emerald-800 flex items-center justify-center group-hover:scale-105 group-hover:bg-emerald-100 group-hover:border-emerald-300 group-hover:text-emerald-950 transition-all shadow-2xs">
-                <Package className="w-5 h-5 stroke-[2.2]" />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-emerald-50 border-2 border-emerald-200/90 text-emerald-800 flex items-center justify-center group-hover:scale-105 group-hover:bg-emerald-100 group-hover:border-emerald-300 group-hover:text-emerald-950 transition-all shadow-2xs">
+                <Package className="w-4 h-4 sm:w-5 sm:h-5 stroke-[2.2]" />
               </div>
             </div>
-            <div className="mt-4">
-              <span className="text-2xl sm:text-3xl font-black text-neutral-900 block leading-tight tracking-tight">
+            <div className="mt-3 sm:mt-4">
+              <span className="text-xl sm:text-3xl font-black text-neutral-900 block leading-tight tracking-tight">
                 {userOrders.length}
               </span>
               <div className="flex items-center gap-1.5 mt-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                <span className="text-xs text-neutral-600 font-semibold">Lifetime purchases</span>
+                <span className="text-[10px] sm:text-xs text-neutral-600 font-semibold truncate">Lifetime purchases</span>
               </div>
             </div>
           </motion.div>
@@ -414,23 +414,23 @@ export default function ProfilePage({
           {/* Total Spent Card */}
           <motion.div 
             whileHover={{ y: -3 }}
-            className="bg-white rounded-3xl p-5 sm:p-6 border-2 border-neutral-200/90 hover:border-emerald-500/70 shadow-2xs hover:shadow-[0_12px_32px_rgba(5,150,105,0.08)] transition-all duration-200 flex flex-col justify-between group"
+            className="bg-white rounded-2xl sm:rounded-3xl p-3.5 sm:p-6 border-2 border-neutral-200/90 hover:border-emerald-500/70 shadow-2xs hover:shadow-[0_12px_32px_rgba(5,150,105,0.08)] transition-all duration-200 flex flex-col justify-between group"
           >
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider text-neutral-500 group-hover:text-neutral-800 transition-colors">
+              <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-neutral-500 group-hover:text-neutral-800 transition-colors">
                 Total Spent
               </span>
-              <div className="w-10 h-10 rounded-2xl bg-emerald-50 border-2 border-emerald-200/90 text-emerald-800 flex items-center justify-center group-hover:scale-105 group-hover:bg-emerald-100 group-hover:border-emerald-300 group-hover:text-emerald-950 transition-all shadow-2xs">
-                <CreditCard className="w-5 h-5 stroke-[2.2]" />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-emerald-50 border-2 border-emerald-200/90 text-emerald-800 flex items-center justify-center group-hover:scale-105 group-hover:bg-emerald-100 group-hover:border-emerald-300 group-hover:text-emerald-950 transition-all shadow-2xs">
+                <CreditCard className="w-4 h-4 sm:w-5 sm:h-5 stroke-[2.2]" />
               </div>
             </div>
-            <div className="mt-4">
-              <span className="text-2xl sm:text-3xl font-black text-neutral-900 block leading-tight tracking-tight">
+            <div className="mt-3 sm:mt-4">
+              <span className="text-xl sm:text-3xl font-black text-neutral-900 block leading-tight tracking-tight">
                 ₹{totalSpent.toLocaleString('en-IN')}
               </span>
               <div className="flex items-center gap-1.5 mt-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                <span className="text-xs text-emerald-700 font-semibold">Verified organic savings</span>
+                <span className="text-[10px] sm:text-xs text-emerald-700 font-semibold truncate">Verified organic savings</span>
               </div>
             </div>
           </motion.div>
@@ -439,21 +439,21 @@ export default function ProfilePage({
           <motion.div 
             whileHover={{ y: -3 }}
             onClick={onOpenCart}
-            className="bg-white rounded-3xl p-5 sm:p-6 border-2 border-neutral-200/90 hover:border-emerald-500/70 shadow-2xs hover:shadow-[0_12px_32px_rgba(5,150,105,0.08)] transition-all duration-200 flex flex-col justify-between cursor-pointer group"
+            className="bg-white rounded-2xl sm:rounded-3xl p-3.5 sm:p-6 border-2 border-neutral-200/90 hover:border-emerald-500/70 shadow-2xs hover:shadow-[0_12px_32px_rgba(5,150,105,0.08)] transition-all duration-200 flex flex-col justify-between cursor-pointer group"
           >
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider text-neutral-500 group-hover:text-emerald-800 transition-colors">
+              <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-neutral-500 group-hover:text-emerald-800 transition-colors">
                 Active Bag
               </span>
-              <div className="w-10 h-10 rounded-2xl bg-emerald-50 border-2 border-emerald-200/90 text-emerald-800 flex items-center justify-center group-hover:scale-105 group-hover:bg-emerald-100 group-hover:border-emerald-300 group-hover:text-emerald-950 transition-all shadow-2xs">
-                <ShoppingBag className="w-5 h-5 stroke-[2.2]" />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-emerald-50 border-2 border-emerald-200/90 text-emerald-800 flex items-center justify-center group-hover:scale-105 group-hover:bg-emerald-100 group-hover:border-emerald-300 group-hover:text-emerald-950 transition-all shadow-2xs">
+                <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5 stroke-[2.2]" />
               </div>
             </div>
-            <div className="mt-4">
-              <span className="text-2xl sm:text-3xl font-black text-neutral-900 block leading-tight tracking-tight">
+            <div className="mt-3 sm:mt-4">
+              <span className="text-xl sm:text-3xl font-black text-neutral-900 block leading-tight tracking-tight">
                 {cartItemsCount} {cartItemsCount === 1 ? 'item' : 'items'}
               </span>
-              <div className="flex items-center gap-1.5 mt-1 text-xs text-emerald-700 font-semibold group-hover:text-emerald-800">
+              <div className="flex items-center gap-1.5 mt-1 text-[10px] sm:text-xs text-emerald-700 font-semibold group-hover:text-emerald-800">
                 <span>Tap to open cart</span>
                 <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
               </div>
@@ -463,23 +463,23 @@ export default function ProfilePage({
           {/* Primary Delivery Hub Card */}
           <motion.div 
             whileHover={{ y: -3 }}
-            className="bg-white rounded-3xl p-5 sm:p-6 border-2 border-neutral-200/90 hover:border-emerald-500/70 shadow-2xs hover:shadow-[0_12px_32px_rgba(5,150,105,0.08)] transition-all duration-200 flex flex-col justify-between group"
+            className="bg-white rounded-2xl sm:rounded-3xl p-3.5 sm:p-6 border-2 border-neutral-200/90 hover:border-emerald-500/70 shadow-2xs hover:shadow-[0_12px_32px_rgba(5,150,105,0.08)] transition-all duration-200 flex flex-col justify-between group"
           >
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider text-neutral-500 group-hover:text-neutral-800 transition-colors">
+              <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-neutral-500 group-hover:text-neutral-800 transition-colors">
                 Delivery Hub
               </span>
-              <div className="w-10 h-10 rounded-2xl bg-emerald-50 border-2 border-emerald-200/90 text-emerald-800 flex items-center justify-center group-hover:scale-105 group-hover:bg-emerald-100 group-hover:border-emerald-300 group-hover:text-emerald-950 transition-all shadow-2xs">
-                <MapPin className="w-5 h-5 stroke-[2.2]" />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-emerald-50 border-2 border-emerald-200/90 text-emerald-800 flex items-center justify-center group-hover:scale-105 group-hover:bg-emerald-100 group-hover:border-emerald-300 group-hover:text-emerald-950 transition-all shadow-2xs">
+                <MapPin className="w-4 h-4 sm:w-5 sm:h-5 stroke-[2.2]" />
               </div>
             </div>
-            <div className="mt-4">
-              <span className="text-xl sm:text-2xl font-black text-neutral-900 truncate block leading-tight tracking-tight">
+            <div className="mt-3 sm:mt-4">
+              <span className="text-base sm:text-2xl font-black text-neutral-900 truncate block leading-tight tracking-tight">
                 {deliveryLocation.split(',')[0]}
               </span>
               <div className="flex items-center gap-1.5 mt-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-xs text-emerald-700 font-semibold">10-min lightning node</span>
+                <span className="text-[10px] sm:text-xs text-emerald-700 font-semibold truncate">10-min lightning node</span>
               </div>
             </div>
           </motion.div>
@@ -566,38 +566,38 @@ export default function ProfilePage({
         )}
 
         {/* ===================== KIRANA HERITAGE PRIVILEGES ===================== */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="p-4 rounded-2xl bg-gradient-to-br from-emerald-50/60 to-white border border-emerald-100 flex items-start gap-3.5">
-            <div className="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-4">
+          <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-gradient-to-br from-emerald-50/60 to-white border border-emerald-100 flex items-start gap-3">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0">
               <Zap className="w-4 h-4 stroke-[2.2]" />
             </div>
             <div>
               <h4 className="text-xs font-black text-neutral-900">10-Min Speed Route</h4>
-              <p className="text-[11px] text-neutral-500 mt-0.5 leading-snug">
+              <p className="text-[10px] sm:text-[11px] text-neutral-500 mt-0.5 leading-snug">
                 Prioritized dispatch from your nearest Kothapet dark store node
               </p>
             </div>
           </div>
 
-          <div className="p-4 rounded-2xl bg-gradient-to-br from-emerald-50/60 to-white border border-emerald-100 flex items-start gap-3.5">
-            <div className="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0">
+          <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-gradient-to-br from-emerald-50/60 to-white border border-emerald-100 flex items-start gap-3">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0">
               <Award className="w-4 h-4 stroke-[2.2]" />
             </div>
             <div>
               <h4 className="text-xs font-black text-neutral-900">100% Organic Direct</h4>
-              <p className="text-[11px] text-neutral-500 mt-0.5 leading-snug">
+              <p className="text-[10px] sm:text-[11px] text-neutral-500 mt-0.5 leading-snug">
                 Verified heritage origin with certified pesticide-free guarantee
               </p>
             </div>
           </div>
 
-          <div className="p-4 rounded-2xl bg-gradient-to-br from-emerald-50/60 to-white border border-emerald-100 flex items-start gap-3.5">
-            <div className="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0">
+          <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-gradient-to-br from-emerald-50/60 to-white border border-emerald-100 flex items-start gap-3">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0">
               <Shield className="w-4 h-4 stroke-[2.2]" />
             </div>
             <div>
               <h4 className="text-xs font-black text-neutral-900">Cloud Bank-Grade Auth</h4>
-              <p className="text-[11px] text-neutral-500 mt-0.5 leading-snug">
+              <p className="text-[10px] sm:text-[11px] text-neutral-500 mt-0.5 leading-snug">
                 Secured by Supabase Postgres Realtime &amp; encrypted sessions
               </p>
             </div>
@@ -605,23 +605,23 @@ export default function ProfilePage({
         </div>
 
         {/* ===================== DETAILED ACCOUNT & SECURITY CREDENTIALS ===================== */}
-        <div className="bg-white rounded-3xl border-2 border-neutral-200/90 p-6 sm:p-8 shadow-2xs space-y-5">
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-neutral-100 pb-4">
+        <div className="bg-white rounded-[22px] sm:rounded-3xl border-2 border-neutral-200/90 p-4 sm:p-8 shadow-2xs space-y-4 sm:space-y-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border-b border-neutral-100 pb-3 sm:pb-4">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-emerald-100/80 text-emerald-800 flex items-center justify-center font-bold">
+              <div className="w-8 h-8 rounded-xl bg-emerald-100/80 text-emerald-800 flex items-center justify-center font-bold shrink-0">
                 <BadgeCheck className="w-4 h-4 stroke-[2.2]" />
               </div>
               <div>
-                <h2 className="text-sm font-black text-neutral-900 uppercase tracking-wider">
+                <h2 className="text-xs sm:text-sm font-bold text-neutral-900 tracking-tight">
                   Verified Account &amp; Security Credentials
                 </h2>
-                <p className="text-xs text-neutral-400">Authenticated user details stored in Supabase Cloud</p>
+                <p className="text-[11px] text-neutral-400">Authenticated user details stored in Supabase Cloud</p>
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
-              <span className="text-[11px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-[10px] sm:text-[11px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                 Live Cloud Sync
               </span>
 
@@ -629,71 +629,71 @@ export default function ProfilePage({
               <button
                 type="button"
                 onClick={handleCopyId}
-                className="group flex items-center gap-1.5 px-3 py-1 rounded-lg bg-neutral-100 hover:bg-neutral-200/80 text-neutral-700 text-xs font-mono font-bold transition-all cursor-pointer border border-neutral-200"
+                className="group flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-neutral-100 hover:bg-neutral-200/80 text-neutral-700 text-[11px] font-mono font-bold transition-all cursor-pointer border border-neutral-200"
                 title="Click to copy Customer ID"
               >
                 <span>ID: {customerId}</span>
                 {copiedId ? (
-                  <Check className="w-3.5 h-3.5 text-emerald-600" />
+                  <Check className="w-3 h-3 text-emerald-600" />
                 ) : (
-                  <Copy className="w-3.5 h-3.5 text-neutral-400 group-hover:text-neutral-700 transition-colors" />
+                  <Copy className="w-3 h-3 text-neutral-400 group-hover:text-neutral-700 transition-colors" />
                 )}
               </button>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-4 text-xs">
             {/* Registered Email */}
-            <div className="flex items-start gap-4 p-4 rounded-2xl bg-neutral-50/70 border border-neutral-200/70 hover:border-emerald-300 hover:bg-emerald-50/20 transition-all group">
-              <div className="w-10 h-10 rounded-2xl bg-white shadow-2xs border border-neutral-200 text-neutral-600 flex items-center justify-center shrink-0 group-hover:border-emerald-300 transition-colors">
-                <Mail className="w-5 h-5 text-emerald-700" />
+            <div className="flex items-start gap-3 p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-neutral-50/70 border border-neutral-200/70 hover:border-emerald-300 hover:bg-emerald-50/20 transition-all group">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-white shadow-2xs border border-neutral-200 text-neutral-600 flex items-center justify-center shrink-0 group-hover:border-emerald-300 transition-colors">
+                <Mail className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-700" />
               </div>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-[10px] text-neutral-500 block font-bold uppercase tracking-wider">Registered Email</span>
-                  <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-extrabold">Verified</span>
+                  <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[9px] sm:text-[10px] font-extrabold">Verified</span>
                 </div>
                 <span className="font-bold text-[#1d1d1f] text-xs sm:text-sm break-all mt-0.5 block">{displayEmail}</span>
               </div>
             </div>
 
             {/* Phone Number */}
-            <div className="flex items-start gap-4 p-4 rounded-2xl bg-neutral-50/70 border border-neutral-200/70 hover:border-emerald-300 hover:bg-emerald-50/20 transition-all group">
-              <div className="w-10 h-10 rounded-2xl bg-white shadow-2xs border border-neutral-200 text-neutral-600 flex items-center justify-center shrink-0 group-hover:border-emerald-300 transition-colors">
-                <Phone className="w-5 h-5 text-emerald-700" />
+            <div className="flex items-start gap-3 p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-neutral-50/70 border border-neutral-200/70 hover:border-emerald-300 hover:bg-emerald-50/20 transition-all group">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-white shadow-2xs border border-neutral-200 text-neutral-600 flex items-center justify-center shrink-0 group-hover:border-emerald-300 transition-colors">
+                <Phone className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-700" />
               </div>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-[10px] text-neutral-500 block font-bold uppercase tracking-wider">Phone Number</span>
-                  <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-extrabold">Active</span>
+                  <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[9px] sm:text-[10px] font-extrabold">Active</span>
                 </div>
                 <span className="font-bold text-[#1d1d1f] text-xs sm:text-sm mt-0.5 block">{displayPhone}</span>
               </div>
             </div>
 
             {/* Default Delivery Address */}
-            <div className="flex items-start gap-4 p-4 rounded-2xl bg-neutral-50/70 border border-neutral-200/70 hover:border-emerald-300 hover:bg-emerald-50/20 transition-all group">
-              <div className="w-10 h-10 rounded-2xl bg-white shadow-2xs border border-neutral-200 text-neutral-600 flex items-center justify-center shrink-0 group-hover:border-emerald-300 transition-colors">
-                <Truck className="w-5 h-5 text-emerald-700" />
+            <div className="flex items-start gap-3 p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-neutral-50/70 border border-neutral-200/70 hover:border-emerald-300 hover:bg-emerald-50/20 transition-all group">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-white shadow-2xs border border-neutral-200 text-neutral-600 flex items-center justify-center shrink-0 group-hover:border-emerald-300 transition-colors">
+                <Truck className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-700" />
               </div>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-[10px] text-neutral-500 block font-bold uppercase tracking-wider">Default Delivery Hub</span>
-                  <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-extrabold">Primary Node</span>
+                  <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[9px] sm:text-[10px] font-extrabold">Primary Node</span>
                 </div>
                 <span className="font-bold text-[#1d1d1f] text-xs sm:text-sm mt-0.5 block">{deliveryLocation} &bull; Express Local</span>
               </div>
             </div>
 
             {/* Active Device & Environment */}
-            <div className="flex items-start gap-4 p-4 rounded-2xl bg-neutral-50/70 border border-neutral-200/70 hover:border-emerald-300 hover:bg-emerald-50/20 transition-all group">
-              <div className="w-10 h-10 rounded-2xl bg-white shadow-2xs border border-neutral-200 text-neutral-600 flex items-center justify-center shrink-0 group-hover:border-emerald-300 transition-colors">
-                <Laptop className="w-5 h-5 text-emerald-700" />
+            <div className="flex items-start gap-3 p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-neutral-50/70 border border-neutral-200/70 hover:border-emerald-300 hover:bg-emerald-50/20 transition-all group">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-white shadow-2xs border border-neutral-200 text-neutral-600 flex items-center justify-center shrink-0 group-hover:border-emerald-300 transition-colors">
+                <Laptop className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-700" />
               </div>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-[10px] text-neutral-500 block font-bold uppercase tracking-wider">Active Device &amp; Session</span>
-                  <span className="px-2 py-0.5 rounded-full bg-neutral-200 text-neutral-700 text-[10px] font-extrabold">Online</span>
+                  <span className="px-2 py-0.5 rounded-full bg-neutral-200 text-neutral-700 text-[9px] sm:text-[10px] font-extrabold">Online</span>
                 </div>
                 <span className="font-bold text-[#1d1d1f] text-xs sm:text-sm truncate block mt-0.5" title={deviceInfo.device}>
                   {deviceInfo.device}
@@ -704,14 +704,14 @@ export default function ProfilePage({
         </div>
 
         {/* ===================== ACTION CONTROLS FOOTER ===================== */}
-        <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-neutral-200/80">
-          <div className="flex items-center gap-2.5 flex-wrap">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-neutral-200/80">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full sm:w-auto">
             <motion.button
               whileHover={{ scale: 1.02, y: -1 }}
               whileTap={{ scale: 0.98 }}
               type="button"
               onClick={onBackToShop}
-              className="px-6 py-2.5 rounded-full text-xs font-black text-white bg-emerald-700 hover:bg-emerald-800 shadow-md hover:shadow-lg transition-all flex items-center gap-2 cursor-pointer"
+              className="w-full sm:w-auto px-6 py-3 sm:py-2.5 rounded-full text-xs font-black text-white bg-emerald-700 hover:bg-emerald-800 shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
               <ShoppingBag className="w-4 h-4" />
               <span>Continue Shopping</span>
@@ -722,7 +722,7 @@ export default function ProfilePage({
               whileTap={{ scale: 0.98 }}
               type="button"
               onClick={onOrdersClick}
-              className="px-6 py-2.5 rounded-full text-xs font-black text-neutral-800 bg-white hover:bg-neutral-50 border-2 border-neutral-300/90 shadow-2xs hover:shadow-xs transition-all flex items-center gap-2 cursor-pointer"
+              className="w-full sm:w-auto px-6 py-3 sm:py-2.5 rounded-full text-xs font-black text-neutral-800 bg-white hover:bg-neutral-50 border-2 border-neutral-300/90 shadow-2xs hover:shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
               <Package className="w-4 h-4 text-emerald-700" />
               <span>Order History</span>
@@ -734,7 +734,7 @@ export default function ProfilePage({
             whileTap={{ scale: 0.98 }}
             type="button"
             onClick={onLogout}
-            className="px-5 py-2.5 rounded-full text-xs font-bold text-rose-600 hover:text-white bg-rose-50/80 hover:bg-rose-600 transition-all flex items-center gap-2 cursor-pointer border border-rose-200/80"
+            className="w-full sm:w-auto px-5 py-3 sm:py-2.5 rounded-full text-xs font-bold text-rose-600 hover:text-white bg-rose-50/80 hover:bg-rose-600 transition-all flex items-center justify-center gap-2 cursor-pointer border border-rose-200/80"
           >
             <LogOut className="w-4 h-4" />
             <span>Sign out</span>
