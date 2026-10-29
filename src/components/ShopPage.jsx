@@ -711,7 +711,7 @@ export default function ShopPage({
 
   return (
     <div className="w-full pt-1.5 sm:pt-2 pb-5 sm:pb-6">
-      <div className="w-[96%] max-w-[1600px] mx-auto px-2 sm:px-3 lg:px-4">
+      <div className="w-[94%] sm:w-[96%] max-w-[1600px] mx-auto px-1 sm:px-3 lg:px-4">
 
         {/* Mobile Filter Toggle Header Bar (Visible on < lg) */}
         <div className="lg:hidden flex items-center justify-between gap-3 mb-4 bg-white/90 backdrop-blur-md p-3.5 rounded-2xl border border-black/[0.06] shadow-xs">
@@ -845,7 +845,7 @@ export default function ShopPage({
                   duration: 0.42,
                   ease: [0.16, 1, 0.3, 1]
                 }}
-                className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 transition-colors duration-300 cursor-pointer shadow-xs border relative group ${
+                className={`hidden lg:flex w-12 h-12 rounded-full items-center justify-center shrink-0 transition-colors duration-300 cursor-pointer shadow-xs border relative group ${
                   isSidebarOpen
                     ? 'bg-white/95 backdrop-blur-md border-black/[0.08] hover:border-emerald-300 hover:bg-emerald-50/50 text-[#1d1d1f] hover:text-emerald-800'
                     : 'bg-emerald-700 hover:bg-emerald-800 border-emerald-700 text-white shadow-md shadow-emerald-700/30 ring-4 ring-emerald-500/15'
@@ -1068,7 +1068,7 @@ export default function ShopPage({
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
               transition={{ type: 'spring', stiffness: 240, damping: 26, mass: 0.85 }}
-              className="absolute top-0 left-0 bottom-0 w-[310px] sm:w-[360px] bg-white/95 backdrop-blur-2xl z-50 p-6 overflow-y-auto overflow-x-hidden shadow-[0_24px_70px_rgba(0,0,0,0.3)] flex flex-col justify-between rounded-r-[32px] sm:rounded-r-[36px] border-r border-black/[0.08]"
+              className="absolute top-0 left-0 bottom-0 w-[88vw] max-w-[340px] bg-white/95 backdrop-blur-2xl z-50 p-5 sm:p-6 overflow-y-auto overflow-x-hidden shadow-[0_24px_70px_rgba(0,0,0,0.3)] flex flex-col justify-between rounded-r-[28px] sm:rounded-r-[36px] border-r border-black/[0.08]"
             >
               <div>
                 {/* Drawer Header matching desktop sidebar */}
@@ -1115,7 +1115,10 @@ export default function ShopPage({
               </div>
 
               {/* Drawer Apply Button */}
-              <div className="pt-5 mt-6 border-t border-black/[0.06] bg-white sticky bottom-0 -mx-6 px-6 -mb-6 pb-6">
+              <div 
+                className="pt-4 mt-6 border-t border-black/[0.06] bg-white sticky bottom-0 -mx-5 sm:-mx-6 px-5 sm:px-6 -mb-5 sm:-mb-6"
+                style={{ paddingBottom: 'calc(1.25rem + env(safe-area-inset-bottom, 0px))' }}
+              >
                 <motion.button
                   type="button"
                   whileHover={{ scale: 1.02 }}

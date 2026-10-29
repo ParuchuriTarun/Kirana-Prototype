@@ -106,7 +106,7 @@ export default function ProductDetailPage({
   };
 
   return (
-    <div className="w-[96%] max-w-[1400px] mx-auto px-2 sm:px-4 py-4 sm:py-8 font-sans antialiased text-[#1d1d1f]">
+    <div className="w-[94%] sm:w-[96%] max-w-[1400px] mx-auto px-1 sm:px-4 py-3 sm:py-8 font-sans antialiased text-[#1d1d1f]">
       
       {/* ==================== BREADCRUMBS & TOP BAR ==================== */}
       <nav aria-label="Breadcrumb" className="flex flex-wrap items-center justify-between gap-3 mb-6">
@@ -159,7 +159,7 @@ export default function ProductDetailPage({
       </nav>
 
       {/* ==================== MAIN PRODUCT HERO SECTION ==================== */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 bg-white rounded-[32px] border border-black/[0.06] p-5 sm:p-8 lg:p-10 shadow-[0_4px_30px_rgba(0,0,0,0.04)]">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12 bg-white rounded-[24px] sm:rounded-[32px] border border-black/[0.06] p-3.5 sm:p-8 lg:p-10 shadow-[0_4px_30px_rgba(0,0,0,0.04)]">
         
         {/* LEFT COLUMN: PRODUCT VISUALS (5 of 12 cols) */}
         <div className="lg:col-span-5 flex flex-col gap-4">
@@ -656,7 +656,7 @@ export default function ProductDetailPage({
             </div>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-4">
             {similarProducts.map((simProd) => (
               <ProductCard
                 key={simProd.id}

@@ -466,7 +466,7 @@ export default function ProductReviewsSection({ product, isModalOpen, onCloseMod
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              className="w-full max-w-lg bg-white rounded-3xl p-6 sm:p-8 shadow-2xl border border-black/[0.08] relative"
+              className="w-full max-w-lg bg-white rounded-[24px] sm:rounded-3xl p-5 sm:p-8 shadow-2xl border border-black/[0.08] relative max-h-[90vh] overflow-y-auto"
             >
               <button
                 type="button"
@@ -597,7 +597,7 @@ export default function ProductReviewsSection({ product, isModalOpen, onCloseMod
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              className="w-full max-w-md bg-white rounded-3xl p-6 sm:p-7 shadow-2xl border border-black/[0.08] relative font-sans"
+              className="w-full max-w-md bg-white rounded-[24px] sm:rounded-3xl p-5 sm:p-7 shadow-2xl border border-black/[0.08] relative font-sans max-h-[90vh] overflow-y-auto"
             >
               <button
                 type="button"

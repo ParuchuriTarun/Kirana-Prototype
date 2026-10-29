@@ -382,7 +382,7 @@ export default function OrdersPage({
   };
 
   return (
-    <div className="w-[96%] max-w-[1100px] mx-auto py-6 sm:py-8 space-y-6">
+    <div className="w-[94%] sm:w-[96%] max-w-[1100px] mx-auto py-4 sm:py-8 space-y-5 sm:space-y-6">
       
       {/* Top Breadcrumb & Navigation Bar */}
       <div className="flex flex-wrap items-center justify-between gap-3 pb-2 border-b border-black/[0.05]">
@@ -433,7 +433,7 @@ export default function OrdersPage({
         animate={{ opacity: 1 }}
         transition={{ duration: 0.25 }}
         style={{ transform: 'none' }}
-        className="bg-white rounded-[32px] sm:rounded-[36px] shadow-[0_16px_50px_rgba(0,0,0,0.05),0_1px_3px_rgba(0,0,0,0.03)] border border-black/[0.07] p-6 sm:p-9 space-y-6 relative"
+        className="bg-white rounded-[24px] sm:rounded-[36px] shadow-[0_16px_50px_rgba(0,0,0,0.05),0_1px_3px_rgba(0,0,0,0.03)] border border-black/[0.07] p-4 sm:p-6 md:p-9 space-y-5 sm:space-y-6 relative"
       >
         {/* Header Title with Live DB Status */}
         <div className="space-y-4 pb-2">
@@ -679,7 +679,7 @@ export default function OrdersPage({
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.97, transition: { duration: 0.15 } }}
                     transition={{ type: "spring", stiffness: 450, damping: 32 }}
-                    className="bg-white rounded-[28px] sm:rounded-[32px] border border-black/[0.08] p-5 sm:p-7 shadow-[0_4px_24px_rgba(0,0,0,0.03)] hover:shadow-[0_14px_36px_rgba(5,150,105,0.08)] transition-shadow duration-300 space-y-5 relative group"
+                    className="bg-white rounded-[22px] sm:rounded-[32px] border border-black/[0.08] p-4 sm:p-7 shadow-[0_4px_24px_rgba(0,0,0,0.03)] hover:shadow-[0_14px_36px_rgba(5,150,105,0.08)] transition-shadow duration-300 space-y-4 sm:space-y-5 relative group"
                   >
                   {/* Order Card Header */}
                   <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-black/[0.06]">

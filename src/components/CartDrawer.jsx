@@ -87,7 +87,7 @@ export default function CartDrawer({
               }`}
             />
 
-            <div className={`fixed inset-y-0 right-0 max-w-full flex pl-10 transition-all duration-300 ${
+            <div className={`fixed inset-y-0 right-0 max-w-full flex pl-0 sm:pl-10 transition-all duration-300 ${
               showPaymentModal ? 'opacity-0 pointer-events-none scale-95 translate-x-10' : 'opacity-100 scale-100 translate-x-0'
             }`}>
               {/* Drawer Panel */}
@@ -96,7 +96,7 @@ export default function CartDrawer({
                 animate={{ x: 0 }}
                 exit={{ x: '100%' }}
                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                className="w-screen max-w-md bg-white/95 backdrop-blur-2xl shadow-hero flex flex-col rounded-l-[32px] sm:rounded-l-[38px] border-l border-black/[0.06] overflow-hidden"
+                className="w-screen max-w-md bg-white/95 backdrop-blur-2xl shadow-hero flex flex-col rounded-l-[28px] sm:rounded-l-[38px] border-l border-black/[0.06] overflow-hidden"
               >
               
               {/* Header */}
@@ -283,7 +283,10 @@ export default function CartDrawer({
                   </div>
 
                   {/* Bill & Checkout */}
-                  <div className="p-5 border-t border-black/[0.05] bg-white space-y-3.5">
+                  <div 
+                    className="p-4 sm:p-5 border-t border-black/[0.05] bg-white space-y-3.5"
+                    style={{ paddingBottom: 'calc(1.25rem + env(safe-area-inset-bottom, 0px))' }}
+                  >
                     <div className="space-y-1.5 text-xs text-[#86868b]">
                       <div className="flex justify-between">
                         <span>Subtotal</span>

@@ -786,6 +786,26 @@ export default function YouPiPaymentModal({
                   )}
                 </div>
 
+                {/* Direct Mobile UPI Intent Button (One-tap payment for phone users) */}
+                <div className="pt-0.5">
+                  <a
+                    href={buildUpiIntentUrl({
+                      vpa: merchantConfig.merchantVpa,
+                      name: merchantConfig.merchantName,
+                      amount: payableAmount,
+                      orderId: orderId,
+                      note: `Kirana Order #${orderId || 'Direct'}`
+                    })}
+                    className="w-full py-2.5 px-3.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold rounded-xl text-xs shadow-md shadow-emerald-700/20 flex items-center justify-center gap-2 transition-all cursor-pointer"
+                  >
+                    <Smartphone className="w-4 h-4 stroke-[2.2]" />
+                    <span>Pay via UPI App (GPay / PhonePe / Paytm)</span>
+                  </a>
+                  <span className="text-[10px] text-neutral-400 block mt-1">
+                    Tap to launch installed UPI apps on this mobile phone
+                  </span>
+                </div>
+
                 {/* Real-Time Banking Observation Radar Indicator */}
                 <div className="p-3 bg-emerald-50/80 border border-emerald-200/90 rounded-2xl text-left space-y-1 relative overflow-hidden">
                   <div className="flex items-center gap-2">

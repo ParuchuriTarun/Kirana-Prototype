@@ -245,7 +245,7 @@ export default function ProfilePage({
   };
 
   return (
-    <div className="w-[96%] max-w-[1140px] mx-auto py-6 sm:py-9 space-y-6">
+    <div className="w-[94%] sm:w-[96%] max-w-[1140px] mx-auto py-4 sm:py-9 space-y-5 sm:space-y-6">
       
       {/* Top Breadcrumb & Navigation Bar */}
       <div className="flex flex-wrap items-center justify-between gap-3 pb-2 border-b border-black/[0.06]">
@@ -283,7 +283,7 @@ export default function ProfilePage({
         className="space-y-6"
       >
         {/* ===================== HERO PROFILE BANNER ===================== */}
-        <div className="relative overflow-hidden rounded-[32px] sm:rounded-[36px] bg-gradient-to-br from-[#064e3b] via-[#047857] to-[#0f766e] p-6 sm:p-9 text-white shadow-[0_16px_48px_rgba(5,150,105,0.28)] border border-emerald-500/20">
+        <div className="relative overflow-hidden rounded-[24px] sm:rounded-[36px] bg-gradient-to-br from-[#064e3b] via-[#047857] to-[#0f766e] p-4.5 sm:p-9 text-white shadow-[0_16px_48px_rgba(5,150,105,0.28)] border border-emerald-500/20">
           {/* Subtle decorative mesh and ambient glows */}
           <div className="absolute -right-12 -bottom-12 w-64 h-64 rounded-full bg-emerald-400/20 blur-3xl pointer-events-none" />
           <div className="absolute top-0 right-1/3 w-48 h-48 rounded-full bg-teal-300/15 blur-2xl pointer-events-none" />
@@ -526,21 +526,21 @@ export default function ProfilePage({
               <div className="grid grid-cols-4 gap-2 text-center text-xs">
                 <div className="space-y-1.5">
                   <div className="w-full h-1.5 rounded-full bg-emerald-600" />
-                  <span className="text-[11px] font-bold text-emerald-900 block">1. Confirmed</span>
+                  <span className="text-[9.5px] sm:text-[11px] font-bold text-emerald-900 block leading-tight">1. Confirmed</span>
                 </div>
                 <div className="space-y-1.5">
                   <div className="w-full h-1.5 rounded-full bg-emerald-600" />
-                  <span className="text-[11px] font-bold text-emerald-900 block">2. Farm Packed</span>
+                  <span className="text-[9.5px] sm:text-[11px] font-bold text-emerald-900 block leading-tight">2. Farm Packed</span>
                 </div>
                 <div className="space-y-1.5">
                   <div className="w-full h-1.5 rounded-full bg-emerald-600 relative overflow-hidden">
                     <div className="absolute inset-0 bg-white/40 animate-pulse" />
                   </div>
-                  <span className="text-[11px] font-bold text-emerald-900 block">3. Out for Delivery</span>
+                  <span className="text-[9.5px] sm:text-[11px] font-bold text-emerald-900 block leading-tight">3. Out for Delivery</span>
                 </div>
                 <div className="space-y-1.5">
                   <div className="w-full h-1.5 rounded-full bg-neutral-200" />
-                  <span className="text-[11px] font-semibold text-neutral-400 block">4. Delivered</span>
+                  <span className="text-[9.5px] sm:text-[11px] font-semibold text-neutral-400 block leading-tight">4. Delivered</span>
                 </div>
               </div>
             </div>

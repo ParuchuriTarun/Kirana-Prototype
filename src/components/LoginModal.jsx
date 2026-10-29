@@ -569,7 +569,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialSte
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: 16 }}
                 transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                className="relative rounded-[32px] max-w-sm sm:max-w-md w-full overflow-hidden z-10 transition-all duration-300 bg-white/95 backdrop-blur-2xl shadow-[0_24px_70px_rgba(0,0,0,0.18)] border border-black/[0.08] p-6 sm:p-8"
+                className="relative rounded-[26px] sm:rounded-[32px] max-w-sm sm:max-w-md w-full max-h-[92vh] overflow-y-auto z-10 transition-all duration-300 bg-white/95 backdrop-blur-2xl shadow-[0_24px_70px_rgba(0,0,0,0.18)] border border-black/[0.08] p-5 sm:p-8"
               >
                 {/* Top Close Button */}
                 <motion.button
