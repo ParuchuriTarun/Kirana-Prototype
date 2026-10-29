@@ -42,15 +42,9 @@ export default function MobileBottomNav({
     },
     {
       id: 'profile',
-      label: user && !user.isGuest ? 'Account' : 'Login',
+      label: user?.isGuest ? 'Guest' : 'Account',
       icon: User,
-      action: () => {
-        if (user && !user.isGuest) {
-          onNavigate('profile');
-        } else {
-          onOpenLogin();
-        }
-      },
+      action: () => onNavigate('profile'),
       isActive: currentPage === 'profile'
     }
   ];

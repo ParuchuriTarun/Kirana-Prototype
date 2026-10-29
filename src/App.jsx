@@ -627,7 +627,7 @@ export default function App() {
           showNotice={showNotice}
         />
 
-      <main className="relative z-0 pt-[72px] sm:pt-[74px] pb-24 md:pb-8">
+      <main className={`relative z-0 pt-[72px] sm:pt-[74px] ${user ? 'pb-24 md:pb-8' : 'pb-8'}`}>
         {currentPage === 'product' && liveSelectedProduct ? (
           <ProductDetailPage
             product={liveSelectedProduct}
@@ -792,8 +792,8 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      {/* Sleek Mobile Bottom Navigation Bar */}
-      {!welcomeActive && currentPage !== 'admin' && (
+      {/* Sleek Mobile Bottom Navigation Bar - Only visible when logged in (at least as guest) */}
+      {!welcomeActive && currentPage !== 'admin' && Boolean(user) && (
         <MobileBottomNav
           currentPage={currentPage}
           onNavigate={(target) => navigateTo(target)}
