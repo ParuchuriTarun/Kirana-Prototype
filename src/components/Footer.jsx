@@ -3,7 +3,7 @@ import { Heart, Sparkles } from 'lucide-react';
 
 export default function Footer({ onCategoryClick, onOffersClick, onAdminClick }) {
   return (
-    <footer className="w-[96%] max-w-[1600px] mx-auto px-1 sm:px-2 pt-2 pb-10 relative">
+    <footer className="w-[94%] sm:w-[96%] max-w-[1600px] mx-auto px-1 sm:px-2 pt-2 pb-10 relative">
       {/* Outer Animated Outline Container */}
       <div className="relative p-[2px] rounded-[32px] overflow-hidden group shadow-[0_8px_32px_rgba(5,150,105,0.06)] hover:shadow-[0_16px_48px_rgba(5,150,105,0.18)] transition-all duration-500">
         

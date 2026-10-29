@@ -17,7 +17,7 @@ export default function CategorySection({
   onSelectCategory
 }) {
   return (
-    <section className="w-[96%] max-w-[1600px] mx-auto px-1 sm:px-2 py-4 sm:py-6">
+    <section className="w-[94%] sm:w-[96%] max-w-[1600px] mx-auto px-1 sm:px-2 py-4 sm:py-6">
       {/* Heading */}
       <div className="flex items-center justify-between mb-5 sm:mb-6">
         <div className="flex items-center gap-3">

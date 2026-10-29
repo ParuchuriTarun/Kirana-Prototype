@@ -90,12 +90,12 @@ export default function Navbar({
   }, [isMenuOpen]);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-40 w-full pt-2 sm:pt-2.5 pb-2 pointer-events-none">
+    <header className="fixed top-0 left-0 right-0 z-40 w-full pt-2.5 sm:pt-3 pb-2 pointer-events-none">
       <motion.div 
         initial={{ y: -16, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
-        className="w-[96%] max-w-[1600px] mx-auto px-1 sm:px-2"
+        className="w-[94%] sm:w-[96%] max-w-[1600px] mx-auto px-1 sm:px-2"
       >
         <nav 
           aria-label="Main Navigation"

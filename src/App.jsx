@@ -42,7 +42,7 @@ const sectionReveal = {
 
 // Subtle section divider
 const SectionDivider = () => (
-  <div className="w-[96%] max-w-[1600px] mx-auto py-2">
+  <div className="w-[94%] sm:w-[96%] max-w-[1600px] mx-auto py-2">
     <div className="h-px bg-gradient-to-r from-transparent via-black/[0.04] to-transparent" />
   </div>
 );

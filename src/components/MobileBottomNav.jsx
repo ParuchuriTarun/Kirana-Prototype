@@ -58,9 +58,12 @@ export default function MobileBottomNav({
   return (
     <nav
       aria-label="Mobile Navigation"
-      className="md:hidden fixed bottom-[max(0.75rem,env(safe-area-inset-bottom,0.75rem))] left-3 right-3 z-40 max-w-lg mx-auto"
+      className="md:hidden fixed left-4 right-4 z-40 max-w-md mx-auto pointer-events-none"
+      style={{
+        bottom: 'calc(16px + env(safe-area-inset-bottom, 0px))'
+      }}
     >
-      <div className="bg-white/92 backdrop-blur-2xl border border-black/[0.08] shadow-[0_12px_36px_rgba(0,0,0,0.14),0_2px_8px_rgba(0,0,0,0.06)] rounded-full px-2 py-1.5 flex items-center justify-around">
+      <div className="pointer-events-auto bg-white/95 backdrop-blur-2xl border border-black/[0.08] shadow-[0_10px_32px_rgba(0,0,0,0.14),0_2px_8px_rgba(0,0,0,0.06)] rounded-full px-2 py-1.5 flex items-center justify-around">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const active = tab.isActive;
