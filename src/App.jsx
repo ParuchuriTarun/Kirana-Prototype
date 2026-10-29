@@ -636,6 +636,14 @@ export default function App() {
         ) : currentPage === 'profile' ? (
           <ProfilePage
             user={user}
+            onUpdateUser={(updated) => {
+              setUser(updated);
+              if (typeof window !== 'undefined') {
+                try {
+                  localStorage.setItem('kirana_current_user', JSON.stringify(updated));
+                } catch (_) {}
+              }
+            }}
             onLogout={handleLogout}
             onBackToShop={handleShopClick}
             onOrdersClick={() => navigateTo('orders')}
