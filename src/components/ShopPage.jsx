@@ -15,6 +15,7 @@ import {
   Percent,
   Coins,
   ChevronRight,
+  ArrowRight,
   Filter,
   Package,
   PanelLeftClose,
