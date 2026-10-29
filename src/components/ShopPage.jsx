@@ -713,37 +713,101 @@ export default function ShopPage({
     <div className="w-full pt-1.5 sm:pt-2 pb-24 sm:pb-8">
       <div className="w-[94%] sm:w-[96%] max-w-[1600px] mx-auto px-1 sm:px-3 lg:px-4">
 
-        {/* Mobile Filter Toggle Header Bar (Visible on < lg) */}
-        <div className="lg:hidden flex items-center justify-between gap-3 mb-4 bg-white/90 backdrop-blur-md p-3.5 rounded-2xl border border-black/[0.06] shadow-xs">
-          <div>
-            <span className="text-xs font-bold text-[#1d1d1f] block truncate">
-              {isAllSelected
-                ? 'All Items'
-                : selectedCategories.length === 1
-                ? selectedCategories[0]
-                : `${selectedCategories.length} Categories selected`}
-            </span>
-            <span className="text-[11px] text-[#86868b]">
-              {filteredProducts.length} items found
-            </span>
+        {/* Mobile Search Bar + Circular Filters Button (Visible on < lg) */}
+        <div className="lg:hidden flex items-center gap-2.5 mb-3.5">
+          {/* Mobile Search Box */}
+          <div className="relative flex-1 group">
+            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400 group-focus-within:text-emerald-700 transition-colors">
+              <Search className="w-4 h-4" />
+            </div>
+            <input
+              id="mobile-shop-top-search"
+              type="text"
+              value={activeSearch}
+              onChange={(e) => {
+                setInternalSearch(e.target.value);
+                if (onSearchChange) onSearchChange(e.target.value);
+              }}
+              placeholder="Search groceries, staples, snacks..."
+              className="w-full h-11 pl-10 pr-9 rounded-full bg-white/95 backdrop-blur-md border border-black/[0.08] text-xs font-medium text-[#1d1d1f] placeholder:text-neutral-400 focus:outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 shadow-2xs transition-all"
+            />
+            {activeSearch && (
+              <button
+                type="button"
+                onClick={() => {
+                  setInternalSearch('');
+                  if (onSearchChange) onSearchChange('');
+                }}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-neutral-400 hover:text-neutral-700 cursor-pointer"
+                aria-label="Clear search"
+              >
+                <div className="w-5 h-5 rounded-full bg-neutral-200 hover:bg-neutral-300 text-neutral-700 flex items-center justify-center transition-colors">
+                  <X className="w-3 h-3 stroke-[2.5]" />
+                </div>
+              </button>
+            )}
           </div>
 
+          {/* Small Filters Circular Button Beside Search Bar */}
           <motion.button
             type="button"
             onClick={() => setIsMobileFilterOpen(true)}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold rounded-full shadow-xs cursor-pointer"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.92 }}
+            className="relative w-11 h-11 rounded-full bg-emerald-700 hover:bg-emerald-800 text-white flex items-center justify-center shrink-0 shadow-md shadow-emerald-700/25 border border-emerald-600 cursor-pointer transition-all"
+            aria-label="Open filter drawer"
+            title="Filter products"
           >
-            <Filter className="w-3.5 h-3.5" />
-            <span>Filters</span>
+            <SlidersHorizontal className="w-4 h-4 stroke-[2.2]" />
             {activeFiltersCount > 0 && (
-              <span className="w-4 h-4 rounded-full bg-amber-400 text-neutral-950 text-[10px] font-extrabold flex items-center justify-center ml-0.5">
+              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-amber-400 text-neutral-950 text-[10px] font-black flex items-center justify-center ring-2 ring-white shadow-xs">
                 {activeFiltersCount}
               </span>
             )}
           </motion.button>
         </div>
+
+        {/* Mobile Active Filter Chips (if any filter is active) */}
+        {activeFiltersCount > 0 && (
+          <div className="lg:hidden flex items-center gap-1.5 overflow-x-auto scrollbar-none pb-1.5 mb-3">
+            {!isAllSelected && selectedCategories.map((cat) => (
+              <span
+                key={cat}
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 text-[11px] font-semibold border border-emerald-200 shadow-2xs shrink-0"
+              >
+                <span>{cat}</span>
+                <button
+                  type="button"
+                  onClick={() => handleCategoryToggle(cat)}
+                  className="hover:text-emerald-950 cursor-pointer p-0.5 rounded-full hover:bg-emerald-200/50"
+                  aria-label={`Remove ${cat} category filter`}
+                >
+                  <X className="w-3 h-3 stroke-[2.5]" />
+                </button>
+              </span>
+            ))}
+            {onlyDiscounts && (
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-50 text-amber-900 text-[11px] font-semibold border border-amber-200 shadow-2xs shrink-0">
+                <span>On Sale</span>
+                <button
+                  type="button"
+                  onClick={() => setOnlyDiscounts(false)}
+                  className="hover:text-amber-950 cursor-pointer p-0.5 rounded-full hover:bg-amber-200/50"
+                  aria-label="Remove on sale filter"
+                >
+                  <X className="w-3 h-3 stroke-[2.5]" />
+                </button>
+              </span>
+            )}
+            <button
+              type="button"
+              onClick={handleResetFilters}
+              className="text-[11px] font-bold text-neutral-500 hover:text-rose-600 px-2 py-0.5 shrink-0 cursor-pointer"
+            >
+              Reset ({activeFiltersCount})
+            </button>
+          </div>
+        )}
 
         {/* Main 2-Column Coordinated Layout with 3D Spatial Folio Unfold Transition */}
         <div
@@ -823,8 +887,8 @@ export default function ShopPage({
           {/* RIGHT PRODUCT CATALOG AREA */}
           <main className="flex-1 w-full min-w-0">
             
-            {/* Catalog Top Controls Row: Circular Toggle Button Beside the Bar */}
-            <div className="flex items-center gap-3 mb-6">
+            {/* Catalog Top Controls Row: Circular Toggle Button Beside the Bar (Desktop Only) */}
+            <div className="hidden lg:flex items-center gap-3 mb-6">
               {/* Circular Sidebar Toggle Button with Kinetic Magnetic Ripple & 3D Morph */}
               <motion.button
                 type="button"
