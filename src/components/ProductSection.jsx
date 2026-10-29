@@ -39,12 +39,12 @@ export default function ProductSection({
       {/* Product Grid / Empty State */}
       {products.length > 0 ? (
         <div 
-          className="flex md:grid md:grid-cols-5 gap-4 overflow-x-auto md:overflow-x-visible pb-2 md:pb-0 snap-x snap-mandatory no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0"
+          className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4.5"
         >
           {products.map((product) => (
             <div 
               key={product.id} 
-              className="snap-start shrink-0 w-[190px] sm:w-[210px] md:w-auto"
+              className="w-full flex"
             >
               <ProductCard
                 product={product}

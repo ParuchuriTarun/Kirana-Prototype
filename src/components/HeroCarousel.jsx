@@ -119,7 +119,7 @@ export default function HeroCarousel({ slides: propSlides, onShopClick }) {
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
-      <div className="relative w-full h-[205px] sm:h-[325px] md:h-[370px] lg:h-[465px] xl:h-[565px] 2xl:h-[750px] flex items-center justify-center">
+      <div className="relative w-full h-[240px] sm:h-[325px] md:h-[370px] lg:h-[465px] xl:h-[565px] 2xl:h-[750px] flex items-center justify-center">
         
         {displaySlides.map((slide, index) => {
           const anim = getCardAnimation(index, currentIndex, totalSlides, direction);
@@ -142,7 +142,7 @@ export default function HeroCarousel({ slides: propSlides, onShopClick }) {
                 if (anim.isRight) goToNext();
                 else if (anim.isLeft) goToPrev();
               }}
-              className={`absolute inset-0 m-auto aspect-[16/9] w-[84%] sm:w-[80%] md:w-[76%] lg:w-[72%] xl:w-[70%] max-w-[1320px] rounded-[24px] sm:rounded-[32px] lg:rounded-[36px] overflow-hidden bg-white ${
+              className={`absolute inset-0 m-auto aspect-[16/10] sm:aspect-[16/9] w-[90%] sm:w-[80%] md:w-[76%] lg:w-[72%] xl:w-[70%] max-w-[1320px] rounded-[22px] sm:rounded-[32px] lg:rounded-[36px] overflow-hidden bg-white ${
                 anim.isCenter 
                   ? 'cursor-default border border-black/[0.04]' 
                   : 'cursor-pointer transition-opacity duration-300 border border-black/[0.04]'
@@ -151,7 +151,7 @@ export default function HeroCarousel({ slides: propSlides, onShopClick }) {
             >
               {/* Slide Canvas */}
               <div 
-                className="w-full h-full relative bg-neutral-900 rounded-[24px] sm:rounded-[32px] lg:rounded-[36px] overflow-hidden"
+                className="w-full h-full relative bg-neutral-900 rounded-[22px] sm:rounded-[32px] lg:rounded-[36px] overflow-hidden"
               >
                 {slide.image ? (
                   <img 
@@ -166,7 +166,7 @@ export default function HeroCarousel({ slides: propSlides, onShopClick }) {
 
                 {/* Rich Overlay Content if Slide has Title or Description */}
                 {(slide.title || slide.subtitle) && (
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent flex flex-col justify-end p-4 sm:p-7 lg:p-11 text-white">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/45 to-transparent flex flex-col justify-end p-4 sm:p-7 lg:p-11 text-white">
                     {slide.badge && (
                       <span className="inline-block px-2.5 py-0.5 rounded-full bg-emerald-500/90 text-white text-[9px] sm:text-[11px] font-extrabold uppercase tracking-wider mb-1 sm:mb-2 w-max shadow-xs">
                         {slide.badge}

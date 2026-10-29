@@ -132,13 +132,19 @@ export default function Navbar({
                 <span className="text-emerald-600 font-extrabold ml-0.5">.</span>
               </div>
             </motion.div>
+
+            {/* Express Delivery Badge for Mobile & Desktop */}
+            <div className="hidden xs:flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 text-[10px] font-bold text-emerald-800 border border-emerald-200/70 select-none shadow-2xs">
+              <span className="text-emerald-600 text-[11px]">⚡</span>
+              <span>15m</span>
+            </div>
           </div>
 
-          {/* RIGHT: Shop Button, Cart Button & Profile when logged in; or Log in button when logged out */}
-          <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
+          {/* RIGHT: Responsive Controls */}
+          <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
             {user ? (
               <>
-                {/* Dynamic Shop / Home Button: In Shop page replaced with Home button, otherwise Shop button */}
+                {/* Dynamic Shop / Home Button (Desktop & Tablet) */}
                 {currentPage === 'shop' ? (
                   <motion.button
                     type="button"
@@ -146,7 +152,7 @@ export default function Navbar({
                     whileHover={{ scale: 1.03 }}
                     whileTap={{ scale: 0.97 }}
                     transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                    className="relative flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-full text-xs font-semibold shadow-xs transition-all duration-200 cursor-pointer"
+                    className="hidden sm:flex relative items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-full text-xs font-semibold shadow-xs transition-all duration-200 cursor-pointer"
                     aria-label="Back to Home"
                   >
                     <Home className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[2]" />
@@ -159,7 +165,7 @@ export default function Navbar({
                     whileHover={{ scale: 1.03 }}
                     whileTap={{ scale: 0.97 }}
                     transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                    className="relative flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-full text-xs font-semibold shadow-xs transition-all duration-200 cursor-pointer"
+                    className="hidden sm:flex relative items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-full text-xs font-semibold shadow-xs transition-all duration-200 cursor-pointer"
                     aria-label="Shop catalog"
                   >
                     <Store className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[2]" />
@@ -174,11 +180,11 @@ export default function Navbar({
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
                   transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                  className="relative flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-full text-xs font-semibold shadow-xs transition-colors duration-200 cursor-pointer"
+                  className="relative flex items-center justify-center sm:justify-start w-8 h-8 sm:w-auto px-0 sm:px-4 py-0 sm:py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-full text-xs font-semibold shadow-xs transition-colors duration-200 cursor-pointer"
                   aria-label={`Open shopping cart with ${totalCartCount} items`}
                 >
-                  <div className="relative">
-                    <ShoppingBag className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[2]" />
+                  <div className="relative flex items-center justify-center">
+                    <ShoppingBag className="w-4 h-4 sm:w-4 sm:h-4 stroke-[2]" />
                     {totalCartCount > 0 && (
                       <motion.span
                         key={totalCartCount}
@@ -191,15 +197,15 @@ export default function Navbar({
                       </motion.span>
                     )}
                   </div>
-                  <span className="hidden sm:inline font-semibold">Cart</span>
+                  <span className="hidden sm:inline font-semibold ml-1.5">Cart</span>
                   {totalCartValue > 0 && (
-                    <span className="text-[11px] font-bold text-emerald-100 hidden xs:inline">
+                    <span className="text-[11px] font-bold text-emerald-100 hidden md:inline ml-1">
                       ₹{totalCartValue}
                     </span>
                   )}
                 </motion.button>
 
-                {/* User Profile Pill */}
+                {/* User Profile Pill - Compact Avatar on Mobile, Full Pill on Desktop */}
                 <div className="relative" ref={menuRef}>
                   <motion.button
                     type="button"
@@ -209,16 +215,17 @@ export default function Navbar({
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.96 }}
                     transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                    className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-full text-[12px] font-medium transition-all duration-200 cursor-pointer shadow-2xs border ${
+                    className={`flex items-center justify-center sm:justify-start w-8 h-8 sm:w-auto p-0 sm:px-3 sm:py-1.5 rounded-full text-[12px] font-medium transition-all duration-200 cursor-pointer shadow-2xs border ${
                       isMenuOpen
                         ? 'bg-emerald-100/90 text-emerald-950 border-emerald-300 ring-2 ring-emerald-500/15'
                         : 'bg-emerald-50 text-emerald-950 border-emerald-200/80 hover:bg-emerald-100/60'
                     }`}
+                    aria-label="User Account Menu"
                   >
-                    <div className="w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px] font-bold shrink-0 shadow-2xs">
+                    <div className="w-7 h-7 sm:w-5 sm:h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[11px] sm:text-[10px] font-bold shrink-0 shadow-2xs">
                       {user.isGuest ? '👤' : (user.name ? user.name.charAt(0).toUpperCase() : 'U')}
                     </div>
-                    <span className="font-semibold text-xs truncate max-w-[80px] sm:max-w-[110px]">
+                    <span className="hidden sm:inline font-semibold text-xs truncate max-w-[80px] sm:max-w-[110px] ml-1.5">
                       {user.name}
                     </span>
                     <motion.span
@@ -227,7 +234,7 @@ export default function Navbar({
                         scale: isMenuOpen ? [1, 1.25, 1] : 1
                       }}
                       transition={{ type: "spring", stiffness: 450, damping: 14 }}
-                      className="flex items-center justify-center"
+                      className="hidden sm:flex items-center justify-center ml-0.5"
                     >
                       <ChevronDown className="w-3.5 h-3.5 text-emerald-700 stroke-[2.2]" />
                     </motion.span>

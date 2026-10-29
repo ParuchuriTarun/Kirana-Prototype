@@ -42,9 +42,9 @@ export default function Footer({ onCategoryClick, onOffersClick, onAdminClick })
         <div className="absolute -top-10 -right-10 w-28 h-28 bg-teal-400/15 rounded-full blur-2xl pointer-events-none animate-pulse-slow" aria-hidden="true" />
 
         {/* Inner Footer Body Container */}
-        <div className="relative rounded-[30px] bg-[#f5f5f7]/95 backdrop-blur-2xl p-8 sm:p-12 z-10">
+        <div className="relative rounded-[30px] bg-[#f5f5f7]/95 backdrop-blur-2xl p-5 sm:p-8 md:p-12 z-10">
           
-          <div className="relative grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 pb-10 border-b border-black/[0.06]">
+          <div className="relative grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 sm:gap-8 pb-6 sm:pb-10 border-b border-black/[0.06]">
             {/* Subtle inner accent separator */}
             <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-emerald-500/25 to-transparent" aria-hidden="true" />
             

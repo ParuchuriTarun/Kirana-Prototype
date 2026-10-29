@@ -13,6 +13,7 @@ import OrdersPage from './components/OrdersPage';
 import Footer from './components/Footer';
 import CartDrawer from './components/CartDrawer';
 import LoginModal from './components/LoginModal';
+import MobileBottomNav from './components/MobileBottomNav';
 import IOSWelcomeScreen from './components/IOSWelcomeScreen';
 import GsapTicker from './components/GsapTicker';
 import { gsapBounce, gsapPulseGlow } from './utils/animations';
@@ -626,7 +627,7 @@ export default function App() {
           showNotice={showNotice}
         />
 
-      <main className="relative z-0 pt-[72px] sm:pt-[74px]">
+      <main className="relative z-0 pt-[72px] sm:pt-[74px] pb-24 md:pb-8">
         {currentPage === 'product' && liveSelectedProduct ? (
           <ProductDetailPage
             product={liveSelectedProduct}
@@ -748,7 +749,7 @@ export default function App() {
         onAdminClick={handleAdminClick}
       />
 
-      {/* Floating Cart Button */}
+      {/* Floating Cart Button (Desktop/Tablet) */}
       <AnimatePresence>
         {totalCartCount > 0 && (
           <motion.aside 
@@ -758,7 +759,7 @@ export default function App() {
             exit={{ opacity: 0, scale: 0.95, y: 16 }}
             transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
             aria-label="Shopping Cart Summary"
-            className="fixed bottom-[max(1.5rem,env(safe-area-inset-bottom,1.5rem))] right-[max(1rem,env(safe-area-inset-right,1rem))] z-40"
+            className="fixed bottom-[max(1.5rem,env(safe-area-inset-bottom,1.5rem))] right-[max(1rem,env(safe-area-inset-right,1rem))] z-40 hidden md:flex"
           >
             <motion.button
               id="floating-cart-btn"
@@ -790,6 +791,21 @@ export default function App() {
           </motion.aside>
         )}
       </AnimatePresence>
+
+      {/* Sleek Mobile Bottom Navigation Bar */}
+      {!welcomeActive && currentPage !== 'admin' && (
+        <MobileBottomNav
+          currentPage={currentPage}
+          onNavigate={(target) => navigateTo(target)}
+          onOpenCart={() => setIsCartOpen(true)}
+          onOpenLogin={() => {
+            setLoginModalMode('input');
+            setIsLoginOpen(true);
+          }}
+          user={user}
+          cartCount={totalCartCount}
+        />
+      )}
 
       <CartDrawer
         isOpen={isCartOpen}

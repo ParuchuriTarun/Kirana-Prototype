@@ -41,8 +41,8 @@ export default function OffersSection({ offers, onOfferClick }) {
         </div>
       </div>
 
-      {/* 3 offer cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
+      {/* 3 offer cards - Horizontal swipe on mobile, 3-col grid on desktop */}
+      <div className="flex overflow-x-auto snap-x snap-mandatory no-scrollbar gap-3 pb-2 -mx-3 px-3 md:grid md:grid-cols-3 md:mx-0 md:px-0">
         {offers.map((offer) => (
           <motion.article
             key={offer.id}
@@ -50,13 +50,13 @@ export default function OffersSection({ offers, onOfferClick }) {
             whileHover={{ y: -4, scale: 1.01 }}
             whileTap={{ scale: 0.985 }}
             transition={{ type: "spring", stiffness: 350, damping: 26 }}
-            className="group flex items-center justify-between p-5 sm:p-6 rounded-[26px] border border-black/[0.06] bg-white cursor-pointer shadow-apple-card hover:shadow-apple-hover transition-all duration-300 relative overflow-hidden"
+            className={`group flex items-center justify-between p-4 sm:p-6 rounded-[22px] sm:rounded-[26px] border ${offer.borderColor || 'border-black/[0.06]'} bg-gradient-to-br ${offer.cardBg || 'from-white to-neutral-50'} cursor-pointer shadow-apple-card hover:shadow-apple-hover transition-all duration-300 relative overflow-hidden shrink-0 snap-start w-[84vw] sm:w-[320px] md:w-auto`}
           >
             {/* Minimalist Apple Corner Badge */}
             {offer.ribbon && (
-              <div className="absolute top-3.5 right-3.5 z-10 pointer-events-none">
-                <div className="bg-emerald-800 text-white font-medium text-[10px] tracking-wide px-2.5 py-0.5 rounded-full shadow-xs border border-emerald-600/40 flex items-center gap-1">
-                  <span className="w-1 h-1 rounded-full bg-emerald-400" />
+              <div className="absolute top-3 right-3 z-10 pointer-events-none">
+                <div className="bg-emerald-800 text-white font-bold text-[9px] sm:text-[10px] tracking-wide px-2.5 py-0.5 rounded-full shadow-xs border border-emerald-600/40 flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                   <span>{offer.ribbon}</span>
                 </div>
               </div>
@@ -65,24 +65,24 @@ export default function OffersSection({ offers, onOfferClick }) {
             {/* Left: Text Content */}
             <div className="flex-1 pr-3">
               {offer.tag && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-medium text-emerald-900 bg-emerald-50 border border-emerald-100 mb-2.5">
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-semibold text-emerald-900 bg-white/80 border border-emerald-200/60 mb-2 shadow-2xs">
                   <span>{offer.tag}</span>
                 </span>
               )}
-              <h3 className="text-base sm:text-lg font-semibold text-[#1d1d1f] font-sans leading-tight group-hover:text-emerald-700 transition-colors duration-200">
+              <h3 className="text-sm sm:text-base font-bold text-[#1d1d1f] font-sans leading-tight group-hover:text-emerald-700 transition-colors duration-200">
                 {offer.title}
               </h3>
-              <p className="text-xs sm:text-sm font-normal text-[#86868b] mt-1 max-w-[200px] leading-relaxed">
+              <p className="text-[11px] sm:text-xs font-normal text-[#86868b] mt-1 max-w-[190px] leading-relaxed line-clamp-2">
                 {offer.subtitle}
               </p>
-              <span className="inline-flex items-center gap-1 text-[12px] font-semibold text-emerald-700 hover:text-emerald-800 mt-3 group-hover:translate-x-0.5 transition-transform duration-200">
+              <span className="inline-flex items-center gap-1 text-[11px] sm:text-xs font-semibold text-emerald-700 hover:text-emerald-800 mt-2.5 group-hover:translate-x-0.5 transition-transform duration-200">
                 Claim Offer <ArrowRight className="w-3 h-3 stroke-[2.2]" />
               </span>
             </div>
 
             {/* Right: Image */}
             <div 
-              className="w-24 h-24 sm:w-28 sm:h-28 rounded-[20px] bg-[#f5f5f7] border border-black/[0.06] shrink-0 overflow-hidden relative shadow-xs"
+              className="w-20 h-20 sm:w-24 sm:h-24 rounded-[16px] sm:rounded-[18px] bg-white border border-black/[0.06] shrink-0 overflow-hidden relative shadow-xs"
               aria-hidden="true"
             >
               {offer.image ? (

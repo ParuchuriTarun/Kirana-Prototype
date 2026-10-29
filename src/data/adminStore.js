@@ -1,5 +1,5 @@
 // Centralized Admin Data Store for Kirana Storefront & Management Portal
-import { ALL_PRODUCTS, HERO_SLIDES as DEFAULT_SLIDES } from './products';
+import { ALL_PRODUCTS, HERO_SLIDES as DEFAULT_SLIDES, CURATED_DEFAULT_PRODUCTS } from './products';
 import { supabase } from '../utils/supabase';
 import { getClientDeviceInfo, getClientNetworkInfo } from '../utils/deviceInfo';
 import { broadcastRemoteLogout } from '../utils/presence';
@@ -66,8 +66,8 @@ export const INITIAL_HERO_SLIDES = [
   }
 ];
 
-// Products store (defaults to empty, populated from Supabase)
-export const INITIAL_PRODUCTS_WITH_STOCK = [];
+// Products store (defaults to rich curated catalog, synchronized with Supabase)
+export const INITIAL_PRODUCTS_WITH_STOCK = CURATED_DEFAULT_PRODUCTS;
 
 // Customers store (defaults to empty, populated from Supabase)
 export const INITIAL_CUSTOMERS = [];
@@ -164,8 +164,18 @@ export function deleteHeroSlide(slideId) {
 
 // 2. PRODUCTS
 export function getProducts() {
-  const items = getStoredItem(STORAGE_KEYS.PRODUCTS, INITIAL_PRODUCTS_WITH_STOCK);
-  return Array.isArray(items) ? items : INITIAL_PRODUCTS_WITH_STOCK;
+  const items = getStoredItem(STORAGE_KEYS.PRODUCTS, null);
+  // Auto-cleanse any dummy test artifacts like 'fsfdvsfgdgvc' or empty cache
+  const isGarbage = Array.isArray(items) && items.some((p) => {
+    const n = (p.name || '').toLowerCase();
+    return n.includes('fsfd') || n.includes('gdfj') || n.includes('test product');
+  });
+
+  if (!items || !Array.isArray(items) || items.length === 0 || isGarbage) {
+    setStoredItem(STORAGE_KEYS.PRODUCTS, CURATED_DEFAULT_PRODUCTS);
+    return CURATED_DEFAULT_PRODUCTS;
+  }
+  return items;
 }
 
 export function saveProducts(products) {
