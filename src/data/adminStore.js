@@ -554,8 +554,8 @@ export function saveOrders(orders) {
 
 export async function createOrder(orderData) {
   const paymentMethodLabel = orderData.utr
-    ? `YouPI-PG UPI (UTR: ${orderData.utr})`
-    : (orderData.paymentMethod || 'YouPI-PG (UPI)');
+    ? `Kirana Pay UPI (UTR: ${orderData.utr})`
+    : (orderData.paymentMethod || 'Kirana Pay (UPI)');
 
   const newOrder = {
     id: `ord-${Date.now()}`,
@@ -613,7 +613,7 @@ export async function createOrder(orderData) {
 export async function processCheckoutOrder(
   cartItems, 
   customerInfo = null, 
-  paymentMethod = 'YouPI-PG (UPI)',
+  paymentMethod = 'Kirana Pay (UPI)',
   paymentDetails = {}
 ) {
   const items = Object.values(cartItems || {});

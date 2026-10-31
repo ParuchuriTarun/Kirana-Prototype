@@ -978,7 +978,7 @@ export default function OrdersPage({
                   <span className="text-[10px] uppercase font-bold text-neutral-400 block">Payment Status</span>
                   <span className="inline-flex items-center gap-1 font-bold text-emerald-700">
                     <CheckCircle2 className="w-3.5 h-3.5" />
-                    PAID ({selectedReceiptOrder.payment_method || 'YouPI-PG UPI'})
+                    PAID ({selectedReceiptOrder.payment_method || 'Kirana Pay UPI'})
                   </span>
                   {selectedReceiptOrder.utr && (
                     <span className="block text-[10px] font-mono font-medium text-neutral-500 mt-0.5">

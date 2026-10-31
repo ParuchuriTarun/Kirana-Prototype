@@ -45,7 +45,7 @@ export default function CartDrawer({
       const result = await processCheckoutOrder(
         cartItems, 
         user, 
-        paymentData.paymentMethod || 'YouPI-PG (UPI)', 
+        paymentData.paymentMethod || 'Kirana Pay (UPI)', 
         paymentData
       );
 
@@ -161,7 +161,7 @@ export default function CartDrawer({
                     )}
                   </div>
                   <p className="text-sm text-[#86868b] mt-3 max-w-xs leading-relaxed">
-                    Your order of <strong className="text-[#1d1d1f]">₹{completedOrder?.amount || grandTotal}</strong> is confirmed via <strong className="text-emerald-700">YouPI-PG</strong> and will arrive in <strong className="text-[#1d1d1f]">15 minutes</strong>.
+                    Your order of <strong className="text-[#1d1d1f]">₹{completedOrder?.amount || grandTotal}</strong> is confirmed via <strong className="text-emerald-700">Kirana Pay</strong> and will arrive in <strong className="text-[#1d1d1f]">15 minutes</strong>.
                   </p>
                   <motion.button
                     whileHover={{ scale: 1.03 }}
@@ -330,7 +330,7 @@ export default function CartDrawer({
                       <div className="flex flex-col text-left leading-tight">
                         <span className="text-[11px] font-medium text-emerald-200 flex items-center gap-1">
                           <Zap className="w-3 h-3 text-emerald-300 fill-emerald-300" />
-                          YouPI-PG • Direct UPI
+                          Kirana Pay • Direct UPI
                         </span>
                         <span className="text-base font-semibold">₹{grandTotal}</span>
                       </div>
@@ -342,7 +342,7 @@ export default function CartDrawer({
                           </>
                         ) : (
                           <>
-                            <span>Pay with YouPI-PG</span>
+                            <span>Pay with Kirana UPI</span>
                             <ArrowRight className="w-4 h-4 stroke-[2]" />
                           </>
                         )}
@@ -351,7 +351,7 @@ export default function CartDrawer({
 
                     <div className="flex items-center justify-center gap-1 text-[11px] text-[#86868b] font-normal">
                       <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                      <span>0% Platform Fee • Powered by YouPI-PG Gateway</span>
+                      <span>0% Platform Fee • Powered by Kirana Direct UPI</span>
                     </div>
                   </div>
                 </>

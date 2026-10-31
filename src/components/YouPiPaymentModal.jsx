@@ -96,7 +96,7 @@ export default function YouPiPaymentModal({
     setTimeout(() => setToastMsg(''), 3000);
   };
 
-  // Reset modal state on open
+  // Reset modal state on open & initialize payment session
   useEffect(() => {
     if (!isOpen) {
       if (timerRef.current) clearInterval(timerRef.current);
@@ -105,26 +105,30 @@ export default function YouPiPaymentModal({
       return;
     }
 
-    // Pre-fill phone if provided or remembered
-    const savedCustomer = localStorage.getItem('youpi_customer_auth');
-    if (savedCustomer) {
-      try {
-        const cust = JSON.parse(savedCustomer);
-        if (cust.phone) setPhone(cust.phone);
-        if (cust.name) setCustomerName(cust.name);
-      } catch {}
-    } else if (customerInfo?.phone) {
-      setPhone(customerInfo.phone);
-    }
-
-    setStep('phone');
-    setAuthError('');
-    setOtp('');
     setShowConfig(false);
     setShowUtrInput(false);
     setManualUtr('');
     setUtrError('');
     setTimeLeft(300);
+
+    const userPhone = customerInfo?.phone || customerInfo?.mobileNumber || '';
+    const cleanUserPhone = (userPhone || '').replace(/\D/g, '').slice(-10);
+
+    if (cleanUserPhone.length === 10) {
+      setPhone(cleanUserPhone);
+      setCustomerName(customerInfo?.name || customerInfo?.fullName || 'Customer');
+      initiatePayment(cleanUserPhone);
+    } else {
+      const savedCustomer = localStorage.getItem('youpi_customer_auth');
+      if (savedCustomer) {
+        try {
+          const cust = JSON.parse(savedCustomer);
+          if (cust.phone) setPhone(cust.phone);
+          if (cust.name) setCustomerName(cust.name);
+        } catch {}
+      }
+      setStep('phone');
+    }
   }, [isOpen]);
 
   // Clean timer & poller on unmount
@@ -173,7 +177,7 @@ export default function YouPiPaymentModal({
         setAuthError(otpRes.error || 'Failed to send OTP code.');
       }
     } catch (err) {
-      setAuthError('Network error connecting to YouPI auth service.');
+      setAuthError('Network error connecting to Kirana Pay auth service.');
     } finally {
       setAuthLoading(false);
     }
@@ -254,8 +258,58 @@ export default function YouPiPaymentModal({
       startPaymentListening(paymentId, resolvedOrderId);
 
     } catch (err) {
-      console.error('[YouPI] Auth verification error:', err);
+      console.error('[Kirana Pay] Auth verification error:', err);
       setAuthError('Could not verify OTP or initiate payment session.');
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  const initiatePayment = async (phoneToUse) => {
+    setAuthLoading(true);
+    setAuthError('');
+    const cleanPhone = (phoneToUse || phone || '').replace(/\D/g, '').slice(-10);
+    const resolvedOrderId = orderId || `ORD-${Date.now().toString().slice(-6)}`;
+
+    try {
+      const paymentRes = await createYouPiPayment({
+        orderId: resolvedOrderId,
+        amount: payableAmount,
+        currency: 'INR',
+        customerInfo: {
+          name: customerName,
+          phone: cleanPhone
+        }
+      });
+
+      const paymentId = paymentRes?.paymentId || `pay_${Date.now()}`;
+      setCurrentPaymentId(paymentId);
+
+      const activeUpiUri = buildUpiIntentUrl({
+        vpa: merchantConfig.merchantVpa,
+        name: merchantConfig.merchantName,
+        amount: payableAmount,
+        orderId: resolvedOrderId,
+        note: `Kirana Order #${resolvedOrderId}`
+      });
+
+      const qr = await generateUpiQrCode(activeUpiUri);
+      setQrDataUrl(qr);
+      setStep('payment');
+      startPaymentListening(paymentId, resolvedOrderId);
+    } catch (err) {
+      console.warn('[Kirana Pay] init fallback:', err);
+      const activeUpiUri = buildUpiIntentUrl({
+        vpa: merchantConfig.merchantVpa,
+        name: merchantConfig.merchantName,
+        amount: payableAmount,
+        orderId: resolvedOrderId,
+        note: `Kirana Order #${resolvedOrderId}`
+      });
+      const qr = await generateUpiQrCode(activeUpiUri);
+      setQrDataUrl(qr);
+      setStep('payment');
+      startPaymentListening(`local_${Date.now()}`, resolvedOrderId);
     } finally {
       setAuthLoading(false);
     }
@@ -340,7 +394,7 @@ export default function YouPiPaymentModal({
           transactionId: details.utr,
           orderId: details.orderId,
           amount: details.amount,
-          paymentMethod: 'YouPI-PG (UPI)',
+          paymentMethod: 'Kirana Pay (UPI)',
           verifiedAt: details.verifiedAt
         });
       }
@@ -431,23 +485,23 @@ export default function YouPiPaymentModal({
           className="relative w-full max-w-[420px] max-h-[92vh] bg-white rounded-[28px] shadow-2xl overflow-hidden border border-black/[0.08] flex flex-col z-10 mx-auto"
         >
           {/* Header Banner */}
-          <div className="bg-gradient-to-br from-emerald-900 via-emerald-800 to-teal-900 text-white p-4 sm:p-5 relative overflow-hidden shrink-0">
+          <div className="bg-gradient-to-br from-[#064e3b] via-[#047857] to-[#0f766e] text-white p-4 sm:p-5 relative overflow-hidden shrink-0">
             <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none" />
             
             <div className="relative flex items-center justify-between z-10">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-inner">
-                  <Zap className="w-4 h-4 text-emerald-300 fill-emerald-300" />
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-white/15 backdrop-blur-md border border-white/25 flex items-center justify-center shadow-inner text-white font-black text-sm">
+                  🌿
                 </div>
                 <div>
                   <div className="flex items-center gap-1.5">
-                    <h3 className="font-bold text-base tracking-tight leading-none">YouPI-PG</h3>
-                    <span className="text-[9px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded-md bg-emerald-400/20 text-emerald-200 border border-emerald-400/30">
+                    <h3 className="font-bold text-base tracking-tight leading-none">Kirana Pay</h3>
+                    <span className="text-[9px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded-md bg-emerald-400/25 text-emerald-100 border border-emerald-400/35">
                       0% Fee
                     </span>
                   </div>
-                  <p className="text-[11px] text-emerald-200/80 font-normal mt-0.5 leading-none">
-                    Direct-to-Bank UPI Gateway
+                  <p className="text-[11px] text-emerald-100/90 font-medium mt-1 leading-none">
+                    Instant Direct-to-Bank UPI
                   </p>
                 </div>
               </div>
@@ -530,7 +584,7 @@ export default function YouPiPaymentModal({
                     <span>Back</span>
                   </button>
                   <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">
-                    Account Settings
+                    Kirana Merchant Settings
                   </span>
                 </div>
 
@@ -600,7 +654,7 @@ export default function YouPiPaymentModal({
                 </form>
               </motion.div>
             ) : step === 'phone' ? (
-              /* STEP 1: Real Customer Phone Authentication */
+              /* STEP 1: Kirana Customer Checkout */
               <motion.div
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -608,17 +662,17 @@ export default function YouPiPaymentModal({
               >
                 <div>
                   <h4 className="text-base font-bold text-neutral-900 tracking-tight">
-                    Sign in to Pay
+                    Kirana Express Checkout
                   </h4>
                   <p className="text-xs text-neutral-500 mt-0.5">
-                    Enter your 10-digit WhatsApp mobile number to continue
+                    Enter your 10-digit mobile number for order delivery &amp; digital UPI receipt
                   </p>
                 </div>
 
-                <form onSubmit={handlePhoneSubmit} className="space-y-3.5">
+                <form onSubmit={(e) => { e.preventDefault(); initiatePayment(phone); }} className="space-y-3.5">
                   <div>
                     <label className="text-xs font-semibold text-neutral-700 block mb-1">
-                      WhatsApp Mobile Number
+                      Delivery Mobile Number
                     </label>
                     <div className="flex items-center rounded-xl border border-neutral-300 bg-neutral-50 focus-within:bg-white focus-within:border-emerald-600 focus-within:ring-2 focus-within:ring-emerald-600/20 overflow-hidden">
                       <div className="px-3 py-2.5 bg-neutral-100/80 border-r border-neutral-300 text-xs font-semibold text-neutral-700 flex items-center gap-1.5 shrink-0">
@@ -638,9 +692,14 @@ export default function YouPiPaymentModal({
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1.5 text-xs text-neutral-500">
-                    <Smartphone className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>We'll verify your mobile via WhatsApp OTP</span>
+                  <div className="p-3 bg-emerald-50/70 border border-emerald-200/80 rounded-2xl text-xs space-y-1 text-emerald-950">
+                    <div className="flex items-center gap-1.5 font-bold text-emerald-900">
+                      <Sparkles className="w-3.5 h-3.5 text-emerald-700" />
+                      <span>15-Minute Express Delivery</span>
+                    </div>
+                    <p className="text-[11px] text-emerald-800 leading-relaxed font-normal">
+                      Instant order confirmation and delivery status will be sent to this number.
+                    </p>
                   </div>
 
                   {authError && (
@@ -652,17 +711,17 @@ export default function YouPiPaymentModal({
 
                   <button
                     type="submit"
-                    disabled={authLoading || phone.length < 10}
+                    disabled={authLoading || phone.replace(/\D/g, '').length < 10}
                     className="w-full py-3 px-4 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-50 text-white font-semibold rounded-xl text-xs sm:text-sm transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer"
                   >
                     {authLoading ? (
                       <>
                         <Loader2 className="w-4 h-4 animate-spin" />
-                        <span>Sending WhatsApp OTP...</span>
+                        <span>Generating Kirana UPI QR...</span>
                       </>
                     ) : (
                       <>
-                        <span>Continue</span>
+                        <span>Proceed to UPI Payment</span>
                         <span>›</span>
                       </>
                     )}
@@ -770,12 +829,12 @@ export default function YouPiPaymentModal({
                     <div className="relative">
                       <img
                         src={qrDataUrl}
-                        alt="YouPI Payment QR"
+                        alt="Kirana Pay UPI QR"
                         className="w-44 h-44 sm:w-48 sm:h-48 mx-auto rounded-lg object-contain select-none"
                       />
                       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                         <div className="px-2 py-0.5 bg-emerald-800 text-white text-[9px] font-bold tracking-wider rounded shadow border border-white/60">
-                          UPI
+                          Kirana Pay
                         </div>
                       </div>
                     </div>
@@ -818,7 +877,7 @@ export default function YouPiPaymentModal({
                     </span>
                   </div>
                   <p className="text-[11px] text-emerald-800 leading-relaxed font-normal">
-                    Scan with Google Pay, PhonePe, Paytm or CRED. Payment will be <strong>detected automatically</strong> by banking observers with <strong>zero clicks</strong>.
+                    Scan with Google Pay, PhonePe, Paytm or CRED. Payment will be <strong>detected automatically</strong> by Kirana banking observers with <strong>zero clicks</strong>.
                   </p>
                 </div>
 
@@ -826,7 +885,7 @@ export default function YouPiPaymentModal({
                 <div className="p-2.5 bg-neutral-50 rounded-xl border border-neutral-200/80 text-xs flex items-center justify-between">
                   <div className="text-left truncate mr-2">
                     <span className="text-[9px] text-neutral-400 uppercase font-bold block leading-none">
-                      Pay to UPI ID (Tarun)
+                      Pay to Kirana Merchant (Tarun)
                     </span>
                     <span className="font-mono font-semibold text-neutral-800 truncate block mt-0.5">
                       {merchantConfig.merchantVpa}
@@ -906,7 +965,7 @@ export default function YouPiPaymentModal({
                     <ShieldCheck className="w-3 h-3 text-emerald-600" />
                     <span>NPCI UPI Direct</span>
                   </div>
-                  <span>YouPI-PG Banking Observer Mesh</span>
+                  <span>Kirana Instant Banking Mesh</span>
                 </div>
               </motion.div>
             ) : step === 'success' ? (
@@ -922,7 +981,7 @@ export default function YouPiPaymentModal({
                 <div>
                   <h4 className="text-lg font-bold text-neutral-900">Payment Successful!</h4>
                   <p className="text-xs text-neutral-500 mt-1">
-                    Your payment was automatically verified by YouPI-PG banking observers.
+                    Your payment was automatically verified by Kirana banking observers.
                   </p>
                 </div>
 

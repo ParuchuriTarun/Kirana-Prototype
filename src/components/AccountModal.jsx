@@ -633,7 +633,7 @@ export default function AccountModal({
                           <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-black/[0.04] text-xs">
                             <div className="flex items-center gap-2 text-[11px] text-neutral-500">
                               <CreditCard className="w-3.5 h-3.5 text-neutral-400" />
-                              <span>{ord.payment_method || 'YouPI-PG (UPI)'}</span>
+                              <span>{ord.payment_method || 'Kirana Pay (UPI)'}</span>
                               <span>•</span>
                               <span className="truncate max-w-[150px]">{ord.shipping_address || 'Express Home Delivery'}</span>
                             </div>
