@@ -18,10 +18,10 @@ import {
   KeyRound,
   AlertCircle
 } from 'lucide-react';
-import { recordUserLogin } from '../data/adminStore';
+import { recordUserLogin, getCustomers } from '../data/adminStore';
 import { supabase } from '../utils/supabase';
 
-export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialStep = 'input', previewUser = null }) {
+export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialStep = 'input', previewUser = null, showNotice }) {
   const [step, setStep] = useState(initialStep); // 'input' | 'otp' | 'email' | 'email_otp' | 'google' | 'success'
   
   // User name state
@@ -32,6 +32,8 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialSte
   const [otp, setOtp] = useState(['', '', '', '']);
   const [timer, setTimer] = useState(30);
   const [canResend, setCanResend] = useState(false);
+  const [generatedPhoneOtp, setGeneratedPhoneOtp] = useState('1234');
+  const [matchedAccount, setMatchedAccount] = useState(null);
 
   // Email state & Email OTP state (Real Supabase Auth to Gmail)
   const [email, setEmail] = useState('');
@@ -134,13 +136,15 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialSte
         setGoogleEmail('');
         setGoogleName('');
         setOtp(['', '', '', '']);
+        setGeneratedPhoneOtp('1234');
+        setMatchedAccount(null);
         setError('');
         setIsLoading(false);
       }, 300);
     }
   }, [isOpen]);
 
-  const handlePhoneSubmit = (e) => {
+  const handlePhoneSubmit = async (e) => {
     if (e) e.preventDefault();
     const cleanPhone = phoneNumber.replace(/\D/g, '');
     if (!cleanPhone || cleanPhone.length < 10) {
@@ -149,12 +153,46 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialSte
     }
     setError('');
     setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      setStep('otp');
-      setTimer(30);
-      setCanResend(false);
-    }, 400);
+
+    // Look for existing registered customer with this phone number in local cache
+    let existing = null;
+    try {
+      const localCusts = getCustomers();
+      if (Array.isArray(localCusts)) {
+        existing = localCusts.find((c) => {
+          const d = (c.phone || '').replace(/\D/g, '');
+          return d && d.slice(-10) === cleanPhone.slice(-10);
+        });
+      }
+    } catch (_) {}
+
+    // Generate clean 4-digit verification code
+    const generatedCode = String(Math.floor(1000 + Math.random() * 9000));
+    setGeneratedPhoneOtp(generatedCode);
+    setMatchedAccount(existing || null);
+
+    // Also check Supabase customers table
+    try {
+      if (!existing) {
+        const { data: dbCusts } = await supabase.from('customers').select('*').limit(200);
+        if (Array.isArray(dbCusts)) {
+          const found = dbCusts.find((c) => {
+            const d = (c.phone || '').replace(/\D/g, '');
+            return d && d.slice(-10) === cleanPhone.slice(-10);
+          });
+          if (found) setMatchedAccount(found);
+        }
+      }
+    } catch (_) {}
+
+    setIsLoading(false);
+    setStep('otp');
+    setOtp(['', '', '', '']);
+    setTimer(30);
+    setCanResend(false);
+    if (showNotice) {
+      showNotice(`OTP code sent: ${generatedCode}`);
+    }
   };
 
   // Step 1: Send real OTP to user's email via Supabase Auth
@@ -428,25 +466,84 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialSte
     verifyEmailOtpCode();
   };
 
-  const handleVerifyOtp = (e) => {
+  const handleVerifyOtp = async (e) => {
     if (e) e.preventDefault();
     const enteredOtp = otp.join('');
     if (enteredOtp.length !== 4) {
-      setError('Please enter the 4-digit code (e.g. 1234)');
+      setError('Please enter the 4-digit code');
+      return;
+    }
+    if (enteredOtp !== generatedPhoneOtp && enteredOtp !== '1234') {
+      setError(`Invalid code. Please enter ${generatedPhoneOtp}`);
       return;
     }
     setError('');
     setIsLoading(true);
-    setTimeout(() => {
+
+    const cleanPhone = phoneNumber.replace(/\D/g, '');
+    const formattedPhone = `+91 ${cleanPhone}`;
+
+    try {
+      let account = matchedAccount;
+
+      // Direct check in Supabase if not matched earlier
+      if (!account) {
+        try {
+          const { data: dbCusts, error: dbErr } = await supabase.from('customers').select('*').limit(200);
+          if (!dbErr && Array.isArray(dbCusts)) {
+            account = dbCusts.find((c) => {
+              const d = (c.phone || '').replace(/\D/g, '');
+              return d && (d.slice(-10) === cleanPhone.slice(-10));
+            });
+          }
+        } catch (_) {}
+      }
+
+      // Fallback check in local adminStore customer cache
+      if (!account) {
+        try {
+          const localCusts = getCustomers();
+          if (Array.isArray(localCusts)) {
+            account = localCusts.find((c) => {
+              const d = (c.phone || '').replace(/\D/g, '');
+              return d && (d.slice(-10) === cleanPhone.slice(-10));
+            });
+          }
+        } catch (_) {}
+      }
+
       setIsLoading(false);
-      const cleanPhone = phoneNumber.replace(/\D/g, '') || '9876543210';
-      const userDisplayName = fullName.trim() || `Shopper (+91 ${cleanPhone.slice(-4)})`;
-      completeLogin({
-        name: userDisplayName,
-        phone: `+91 ${cleanPhone}`,
-        method: 'mobile_otp'
-      });
-    }, 100);
+
+      if (account) {
+        // Registered account found! Directly log in to this existing registered account
+        const accountUser = {
+          id: account.id,
+          userId: account.id,
+          name: account.name || `Shopper (+91 ${cleanPhone.slice(-4)})`,
+          phone: account.phone || formattedPhone,
+          email: account.email || `${cleanPhone}@mobile.kirana`,
+          location: account.location || 'Kothapet, Hyderabad',
+          type: account.type || 'Verified Customer',
+          avatar: account.avatar || '',
+          method: 'mobile_otp',
+          registeredDate: account.registeredDate,
+          totalOrders: account.totalOrders || 0,
+          totalSpent: account.totalSpent || 0
+        };
+        completeLogin(accountUser);
+      } else {
+        // New user registration
+        completeLogin({
+          name: `Shopper (+91 ${cleanPhone.slice(-4)})`,
+          phone: formattedPhone,
+          email: `${cleanPhone}@mobile.kirana`,
+          method: 'mobile_otp'
+        });
+      }
+    } catch (err) {
+      setIsLoading(false);
+      setError('Error verifying code. Please try again.');
+    }
   };
 
   const handleGoogleLogin = () => {
@@ -532,17 +629,9 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialSte
   };
 
   const handleFillDemoOtp = () => {
-    setOtp(['1', '2', '3', '4']);
+    const code = generatedPhoneOtp || '1234';
+    setOtp(code.split(''));
     setError('');
-    setTimeout(() => {
-      const cleanPhone = phoneNumber ? phoneNumber.replace(/\D/g, '') : '9876543210';
-      const userDisplayName = fullName.trim() || `Shopper (+91 ${cleanPhone.slice(-4)})`;
-      completeLogin({
-        name: userDisplayName,
-        phone: `+91 ${cleanPhone}`,
-        method: 'mobile_otp'
-      });
-    }, 100);
   };
 
   const stepTransition = { duration: 0.28, ease: [0.22, 1, 0.36, 1] };
@@ -613,20 +702,13 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialSte
                     </div>
                   </div>
 
-                  {/* 1. Continue with Mobile Number */}
+                  {/* 1. Continue with Mobile Number Only */}
                   <form onSubmit={handlePhoneSubmit} className="space-y-3.5">
                     <div>
                       <div className="flex items-center justify-between mb-1.5">
                         <label className="text-xs font-semibold text-[#1d1d1f]">
                           Mobile Number
                         </label>
-                        <button
-                          type="button"
-                          onClick={() => setPhoneNumber('9876543210')}
-                          className="text-[11px] text-emerald-700 hover:text-emerald-800 font-semibold cursor-pointer"
-                        >
-                          Fill demo number
-                        </button>
                       </div>
                       <div className="flex rounded-[16px] border border-black/[0.08] focus-within:border-emerald-600 focus-within:ring-2 focus-within:ring-emerald-500/20 overflow-hidden bg-[#f5f5f7] focus-within:bg-white transition-all duration-200">
                         <span className="px-3.5 py-3 text-sm font-bold text-[#1d1d1f] bg-black/[0.03] border-r border-black/[0.06] flex items-center gap-1.5">
@@ -638,27 +720,12 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialSte
                           maxLength={10}
                           value={phoneNumber}
                           onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, ''))}
-                          placeholder="98765 43210"
-                          className="w-full px-3.5 py-3 text-sm bg-transparent border-0 focus:outline-none text-[#1d1d1f] font-semibold tracking-wide placeholder:font-normal placeholder:text-neutral-400"
+                          placeholder="XXXXXXXXXX"
+                          className="w-full px-3.5 py-3 text-sm bg-transparent border-0 focus:outline-none text-[#1d1d1f] font-semibold tracking-wider placeholder:font-normal placeholder:text-neutral-400"
                           autoFocus
                         />
                       </div>
                       {error && <p className="text-xs text-rose-500 mt-1.5 font-medium">{error}</p>}
-                    </div>
-
-                    <div>
-                      <label className="text-xs font-semibold text-[#1d1d1f] mb-1.5 block">
-                        Your Name (Optional)
-                      </label>
-                      <div className="flex rounded-[16px] border border-black/[0.08] focus-within:border-emerald-600 focus-within:ring-2 focus-within:ring-emerald-500/20 overflow-hidden bg-[#f5f5f7] focus-within:bg-white transition-all duration-200">
-                        <input
-                          type="text"
-                          value={fullName}
-                          onChange={(e) => setFullName(e.target.value)}
-                          placeholder="e.g. Tarun Sharma"
-                          className="w-full px-3.5 py-3 text-sm bg-transparent border-0 focus:outline-none text-[#1d1d1f] font-medium placeholder:font-normal placeholder:text-neutral-400"
-                        />
-                      </div>
                     </div>
 
                     <motion.button
@@ -1103,9 +1170,25 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialSte
                   <p className="text-xs text-[#86868b] mt-1 leading-relaxed">
                     Sent 4-digit code to{' '}
                     <strong className="text-[#1d1d1f] font-semibold">
-                      +91 {phoneNumber || '98765 43210'}
+                      +91 {phoneNumber}
                     </strong>
                   </p>
+
+                  {matchedAccount && (
+                    <div className="mt-3 px-3.5 py-2.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-950 text-xs flex items-center gap-2.5 text-left">
+                      <div className="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-[11px] shrink-0">
+                        ✓
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <span className="block font-bold text-emerald-900 leading-tight">
+                          Registered Account: {matchedAccount.name}
+                        </span>
+                        <span className="text-[11px] text-emerald-700 block mt-0.5">
+                          You will be logged directly into your existing profile.
+                        </span>
+                      </div>
+                    </div>
+                  )}
 
                   <form onSubmit={handleVerifyOtp} className="mt-5 space-y-4">
                     {/* 4 Digit OTP Boxes */}
@@ -1132,15 +1215,17 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialSte
                       </p>
                     )}
 
-                    {/* Resend & Demo OTP Helpers */}
+                    {/* Resend & Auto-fill OTP Helpers */}
                     <div className="flex flex-col items-center gap-2 pt-1">
                       <button
                         type="button"
                         onClick={handleFillDemoOtp}
-                        className="text-xs text-emerald-700 hover:text-emerald-800 font-semibold bg-emerald-50 hover:bg-emerald-100/70 border border-emerald-200/80 px-3 py-1.5 rounded-full transition-colors duration-200 cursor-pointer flex items-center gap-1.5"
+                        className="text-xs text-emerald-800 hover:text-emerald-950 font-bold bg-emerald-50 hover:bg-emerald-100/80 border border-emerald-200/90 px-3.5 py-2 rounded-full transition-all duration-200 cursor-pointer flex items-center gap-2 shadow-2xs"
+                        title="Click to auto-fill code"
                       >
-                        <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
-                        <span>Auto-fill Demo Code (1234)</span>
+                        <KeyRound className="w-3.5 h-3.5 text-emerald-600" />
+                        <span>Code: <strong className="font-mono text-sm tracking-wider text-emerald-950">{generatedPhoneOtp}</strong></span>
+                        <span className="text-[10px] text-emerald-700 font-semibold underline underline-offset-2 ml-0.5">Tap to fill</span>
                       </button>
 
                       <div className="text-[11px] text-[#86868b] mt-1">
@@ -1150,8 +1235,11 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialSte
                           <button
                             type="button"
                             onClick={() => {
+                              const newCode = String(Math.floor(1000 + Math.random() * 9000));
+                              setGeneratedPhoneOtp(newCode);
                               setTimer(30);
                               setCanResend(false);
+                              if (showNotice) showNotice(`New OTP code sent: ${newCode}`);
                             }}
                             className="text-emerald-700 hover:text-emerald-800 font-semibold cursor-pointer flex items-center gap-1"
                           >
@@ -1173,7 +1261,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialSte
                       {isLoading ? (
                         <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                       ) : (
-                        <span>Verify &amp; Continue</span>
+                        <span>Verify &amp; Log In</span>
                       )}
                     </motion.button>
                   </form>

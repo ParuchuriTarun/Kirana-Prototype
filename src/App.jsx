@@ -857,6 +857,7 @@ export default function App() {
         isOpen={isLoginOpen}
         initialStep={loginModalMode}
         previewUser={user}
+        showNotice={showNotice}
         onClose={() => {
           setIsLoginOpen(false);
           setLoginModalMode('input');
