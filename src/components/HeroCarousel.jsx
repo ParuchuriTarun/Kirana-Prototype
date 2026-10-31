@@ -23,20 +23,39 @@ const getCardAnimation = (slideIndex, activeIndex, totalSlides, direction) => {
   const isLeft = offset === -1;
   const isRight = offset === 1;
 
+  // Strictly conceal any non-adjacent slide so it never stacks or ghosts behind adjacent slides
+  if (!isCenter && !isLeft && !isRight) {
+    return {
+      isCenter: false,
+      isLeft: false,
+      isRight: false,
+      x: offset < 0 ? '-35%' : '35%',
+      y: '0%',
+      scale: 0.72,
+      opacity: 0,
+      zIndex: 0,
+      pointerEvents: 'none',
+      visibility: 'hidden',
+      boxShadow: 'none',
+      filter: 'brightness(0.9)',
+    };
+  }
+
   return {
     isCenter,
     isLeft,
     isRight,
-    x: `${offset * 22}%`,
+    x: isCenter ? '0%' : (isLeft ? '-24%' : '24%'),
     y: '0%',
-    scale: isCenter ? 1.08 : 0.88,
-    opacity: isCenter ? 1 : (isLeft || isRight ? 0.72 : 0),
-    zIndex: isCenter ? 30 : (isLeft || isRight ? 15 : 0),
-    pointerEvents: (isCenter || isLeft || isRight) ? 'auto' : 'none',
+    scale: isCenter ? 1.02 : 0.86,
+    opacity: isCenter ? 1 : 0.65,
+    zIndex: isCenter ? 30 : 15,
+    pointerEvents: 'auto',
+    visibility: 'visible',
     boxShadow: isCenter 
-      ? '0 0 0 1px rgba(0, 0, 0, 0.04), 0 4px 16px rgba(0, 0, 0, 0.04), 0 28px 64px -16px rgba(0, 0, 0, 0.16)' 
-      : '0 0 0 1px rgba(0, 0, 0, 0.03), 0 2px 8px rgba(0, 0, 0, 0.03), 0 10px 24px -8px rgba(0, 0, 0, 0.08)',
-    filter: isCenter ? 'brightness(1)' : 'brightness(0.94)',
+      ? '0 0 0 1px rgba(0, 0, 0, 0.04), 0 8px 24px -4px rgba(0, 0, 0, 0.12), 0 24px 48px -12px rgba(0, 0, 0, 0.16)' 
+      : '0 0 0 1px rgba(0, 0, 0, 0.03), 0 4px 12px -2px rgba(0, 0, 0, 0.06)',
+    filter: isCenter ? 'brightness(1)' : 'brightness(0.92)',
   };
 };
 
@@ -112,14 +131,14 @@ export default function HeroCarousel({ slides: propSlides, onShopClick }) {
 
   return (
     <section 
-      className="w-full px-2 sm:px-4 md:px-6 pt-0 pb-0 select-none overflow-x-clip -mt-1 sm:-mt-2"
+      className="w-full px-2 sm:px-4 md:px-6 pt-1 sm:pt-2 pb-0 select-none overflow-x-clip"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
-      <div className="relative w-full h-[240px] sm:h-[320px] md:h-[370px] lg:h-[440px] xl:h-[490px] 2xl:h-[540px] flex items-center justify-center">
+      <div className="relative w-full h-[250px] sm:h-[330px] md:h-[380px] lg:h-[430px] xl:h-[470px] flex items-center justify-center">
         
         {displaySlides.map((slide, index) => {
           const anim = getCardAnimation(index, currentIndex, totalSlides, direction);
@@ -136,18 +155,26 @@ export default function HeroCarousel({ slides: propSlides, onShopClick }) {
                 boxShadow: anim.boxShadow,
                 filter: anim.filter,
               }}
-              whileHover={!anim.isCenter ? { opacity: 0.95 } : {}}
-              transition={appleTransition}
+              whileHover={(anim.isLeft || anim.isRight) ? { opacity: 0.9, filter: 'brightness(0.98)' } : undefined}
+              transition={{
+                x: appleTransition,
+                scale: appleTransition,
+                filter: appleTransition,
+                opacity: { duration: 0.22, ease: "easeOut" }
+              }}
               onClick={() => {
                 if (anim.isRight) goToNext();
                 else if (anim.isLeft) goToPrev();
               }}
-              className={`absolute inset-0 m-auto aspect-[16/10] sm:aspect-[16/9] w-[90%] sm:w-[80%] md:w-[76%] lg:w-[72%] xl:w-[70%] max-w-[1320px] rounded-[22px] sm:rounded-[32px] lg:rounded-[36px] overflow-hidden bg-white ${
+              className={`absolute inset-0 m-auto h-[82%] sm:h-[84%] lg:h-[86%] w-[90%] sm:w-[82%] md:w-[76%] lg:w-[72%] xl:w-[68%] max-w-[1180px] rounded-[22px] sm:rounded-[32px] lg:rounded-[36px] overflow-hidden bg-white ${
                 anim.isCenter 
                   ? 'cursor-default border border-black/[0.04]' 
                   : 'cursor-pointer transition-opacity duration-300 border border-black/[0.04]'
               }`}
-              style={{ pointerEvents: anim.pointerEvents }}
+              style={{ 
+                pointerEvents: anim.pointerEvents,
+                visibility: anim.visibility 
+              }}
             >
               {/* Slide Canvas */}
               <div 
@@ -213,7 +240,7 @@ export default function HeroCarousel({ slides: propSlides, onShopClick }) {
         {/* Apple Pagination Dots */}
         {totalSlides > 1 && (
           <div 
-            className="absolute bottom-0.5 sm:bottom-1 left-1/2 -translate-x-1/2 flex items-center gap-2 z-40"
+            className="absolute bottom-1.5 sm:bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-2 z-40"
             aria-label="Carousel pagination"
           >
             {displaySlides.map((_, idx) => (
@@ -234,7 +261,7 @@ export default function HeroCarousel({ slides: propSlides, onShopClick }) {
                     transition={{ type: "spring", stiffness: 400, damping: 30 }}
                   />
                 ) : (
-                  <div className="w-[4px] h-[4px] bg-white/40 hover:bg-white/70 rounded-full transition-colors duration-200" />
+                  <div className="w-[4px] h-[4px] bg-neutral-400/50 hover:bg-neutral-600 rounded-full transition-colors duration-200" />
                 )}
               </button>
             ))}

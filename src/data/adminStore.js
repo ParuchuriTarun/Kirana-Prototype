@@ -165,10 +165,20 @@ export function deleteHeroSlide(slideId) {
 // 2. PRODUCTS
 export function getProducts() {
   const items = getStoredItem(STORAGE_KEYS.PRODUCTS, null);
-  // Auto-cleanse any dummy test artifacts like 'fsfdvsfgdgvc' or empty cache
+  // Auto-cleanse any dummy test artifacts like 'fhtfchvhgcgvc', 'fsfdvsfgdgvc', base64 balloons or empty cache
   const isGarbage = Array.isArray(items) && items.some((p) => {
     const n = (p.name || '').toLowerCase();
-    return n.includes('fsfd') || n.includes('gdfj') || n.includes('test product');
+    const img = (p.image || '');
+    return n.includes('fsfd') || 
+           n.includes('gdfj') || 
+           n.includes('fhtf') || 
+           n.includes('gcfg') || 
+           n.includes('cfgfc') || 
+           n.includes('hvhg') || 
+           n.includes('vcgd') || 
+           n.includes('vtfc') || 
+           n.includes('test product') || 
+           img.startsWith('data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD');
   });
 
   if (!items || !Array.isArray(items) || items.length === 0 || isGarbage) {
@@ -783,8 +793,17 @@ export async function syncFromSupabase() {
   try {
     // 1. Sync Products
     const { data: dbProducts, error: prodErr } = await supabase.from('products').select('*');
-    if (!prodErr && dbProducts !== null) {
-      setStoredItem(STORAGE_KEYS.PRODUCTS, dbProducts);
+    if (!prodErr && Array.isArray(dbProducts) && dbProducts.length > 0) {
+      const hasGarbage = dbProducts.some((p) => {
+        const n = (p.name || '').toLowerCase();
+        const img = (p.image || '');
+        return n.includes('fhtf') || n.includes('gcfg') || n.includes('cfgfc') || n.includes('hvhg') || n.includes('vcgd') || n.includes('vtfc') || img.startsWith('data:image/jpeg;base64,/9j/4AAQSkZJRg');
+      });
+      if (!hasGarbage) {
+        setStoredItem(STORAGE_KEYS.PRODUCTS, dbProducts);
+      } else {
+        setStoredItem(STORAGE_KEYS.PRODUCTS, CURATED_DEFAULT_PRODUCTS);
+      }
     }
 
     // 2. Sync Hero Slides

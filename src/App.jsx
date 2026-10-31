@@ -707,12 +707,16 @@ export default function App() {
           />
         ) : (
           <>
-            <HeroCarousel onShopClick={handleShopClick} />
-            <GsapTicker />
+            <div className="mb-4 sm:mb-6">
+              <HeroCarousel onShopClick={handleShopClick} />
+            </div>
+            <div className="relative z-10">
+              <GsapTicker />
+            </div>
 
             <SectionDivider />
 
-            <motion.div id="products" className="scroll-mt-24" {...sectionReveal}>
+            <motion.div id="products" className="scroll-mt-28" {...sectionReveal}>
               <ProductSection
                 products={displayedProducts}
                 cartItems={cartItems}
@@ -726,7 +730,7 @@ export default function App() {
 
             <SectionDivider />
 
-            <motion.div id="categories" className="scroll-mt-24" {...sectionReveal}>
+            <motion.div id="categories" className="scroll-mt-28" {...sectionReveal}>
               <CategorySection
                 categories={CATEGORIES}
                 selectedCategory={selectedCategory}
@@ -739,7 +743,7 @@ export default function App() {
 
             <SectionDivider />
 
-            <motion.div id="offers" className="scroll-mt-24" {...sectionReveal}>
+            <motion.div id="offers" className="scroll-mt-28" {...sectionReveal}>
               <OffersSection
                 offers={FEATURED_OFFERS}
                 onOfferClick={(offer) => showNotice(`Offer selected: ${offer.title}`)}

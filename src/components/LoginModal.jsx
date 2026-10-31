@@ -1650,7 +1650,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialSte
                     Enter Verification Code
                   </h3>
                   <p className="text-xs text-[#86868b] mt-1 leading-relaxed">
-                    Sent 4-digit code to{' '}
+                    Sent 6-digit WhatsApp code to{' '}
                     <strong className="text-[#1d1d1f] font-semibold">
                       +91 {phoneNumber}
                     </strong>
