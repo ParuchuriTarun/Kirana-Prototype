@@ -119,7 +119,7 @@ export default function HeroCarousel({ slides: propSlides, onShopClick }) {
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
-      <div className="relative w-full h-[240px] sm:h-[325px] md:h-[370px] lg:h-[465px] xl:h-[565px] 2xl:h-[750px] flex items-center justify-center">
+      <div className="relative w-full h-[240px] sm:h-[320px] md:h-[370px] lg:h-[440px] xl:h-[490px] 2xl:h-[540px] flex items-center justify-center">
         
         {displaySlides.map((slide, index) => {
           const anim = getCardAnimation(index, currentIndex, totalSlides, direction);

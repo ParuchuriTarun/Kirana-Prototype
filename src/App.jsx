@@ -67,13 +67,6 @@ export default function App() {
       if (hash.startsWith('#/product/') || hash.startsWith('#product/')) {
         return 'product';
       }
-      // If user is already logged in, enter shop page instead of home page
-      try {
-        const savedUser = localStorage.getItem('kirana_current_user');
-        if (savedUser && (!hash || hash === '#/' || hash === '#' || hash === '')) {
-          return 'shop';
-        }
-      } catch (_) {}
     }
     return 'home';
   };
@@ -719,7 +712,7 @@ export default function App() {
 
             <SectionDivider />
 
-            <motion.div id="products" {...sectionReveal}>
+            <motion.div id="products" className="scroll-mt-24" {...sectionReveal}>
               <ProductSection
                 products={displayedProducts}
                 cartItems={cartItems}
@@ -733,7 +726,7 @@ export default function App() {
 
             <SectionDivider />
 
-            <motion.div id="categories" {...sectionReveal}>
+            <motion.div id="categories" className="scroll-mt-24" {...sectionReveal}>
               <CategorySection
                 categories={CATEGORIES}
                 selectedCategory={selectedCategory}
@@ -746,7 +739,7 @@ export default function App() {
 
             <SectionDivider />
 
-            <motion.div id="offers" {...sectionReveal}>
+            <motion.div id="offers" className="scroll-mt-24" {...sectionReveal}>
               <OffersSection
                 offers={FEATURED_OFFERS}
                 onOfferClick={(offer) => showNotice(`Offer selected: ${offer.title}`)}

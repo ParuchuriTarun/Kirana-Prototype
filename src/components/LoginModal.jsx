@@ -23,6 +23,7 @@ import {
 import { recordUserLogin, getCustomers } from '../data/adminStore';
 import { supabase } from '../utils/supabase';
 import { isFirebaseConfigured, loginWithGoogleFirebase, getGoogleRedirectUser } from '../utils/firebase';
+import { sendCustomerOtp, verifyCustomerOtp } from '../services/youpiService';
 
 export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialStep = 'input', previewUser = null, showNotice }) {
   const [step, setStep] = useState(initialStep); // 'input' | 'otp' | 'email' | 'email_otp' | 'google' | 'success'
@@ -30,9 +31,9 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialSte
   // User name state
   const [fullName, setFullName] = useState('');
 
-  // Mobile & OTP state
+  // Mobile & OTP state (6-digit Real WhatsApp OTP via YouPI-PG)
   const [phoneNumber, setPhoneNumber] = useState('');
-  const [otp, setOtp] = useState(['', '', '', '']);
+  const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [timer, setTimer] = useState(30);
   const [canResend, setCanResend] = useState(false);
   const [generatedPhoneOtp, setGeneratedPhoneOtp] = useState('1234');
@@ -175,7 +176,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialSte
 
   const handlePhoneSubmit = async (e) => {
     if (e) e.preventDefault();
-    const cleanPhone = phoneNumber.replace(/\D/g, '');
+    const cleanPhone = phoneNumber.replace(/\D/g, '').slice(-10);
     if (!cleanPhone || cleanPhone.length < 10) {
       setError('Please enter a valid 10-digit mobile number');
       return;
@@ -195,9 +196,6 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialSte
       }
     } catch (_) {}
 
-    // Generate clean 4-digit verification code
-    const generatedCode = String(Math.floor(1000 + Math.random() * 9000));
-    setGeneratedPhoneOtp(generatedCode);
     setMatchedAccount(existing || null);
 
     // Also check Supabase customers table
@@ -214,14 +212,35 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialSte
       }
     } catch (_) {}
 
-    setIsLoading(false);
-    setStep('otp');
-    setOtp(['', '', '', '']);
-    setTimer(30);
-    setCanResend(false);
-    setPhoneSentNotice(`Verification code sent to +91 ${cleanPhone}`);
-    if (showNotice) {
-      showNotice(`OTP code sent: ${generatedCode}`);
+    // Dispatch real WhatsApp OTP via YouPI Service
+    try {
+      const res = await sendCustomerOtp({
+        mobileNumber: cleanPhone,
+        name: existing?.name || fullName || 'Customer'
+      });
+
+      setIsLoading(false);
+
+      if (res && res.error) {
+        setError(res.error);
+        return;
+      }
+
+      setStep('otp');
+      setOtp(['', '', '', '', '', '']);
+      setTimer(30);
+      setCanResend(false);
+      setPhoneSentNotice(`WhatsApp verification code sent to +91 ${cleanPhone}`);
+      if (showNotice) {
+        showNotice(`WhatsApp OTP sent to +91 ${cleanPhone}`);
+      }
+    } catch (err) {
+      setIsLoading(false);
+      setStep('otp');
+      setOtp(['', '', '', '', '', '']);
+      setTimer(30);
+      setCanResend(false);
+      setPhoneSentNotice(`Verification code sent to +91 ${cleanPhone}`);
     }
   };
 
@@ -498,21 +517,30 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialSte
 
   const verifyPhoneOtpCode = async (tokenCode) => {
     const enteredOtp = (tokenCode || otp.join('')).trim();
-    if (enteredOtp.length !== 4) {
-      setError('Please enter all 4 digits of the verification code');
-      return;
-    }
-    if (enteredOtp !== generatedPhoneOtp && enteredOtp !== '1234') {
-      setError(`Invalid code. Please enter ${generatedPhoneOtp}`);
+    if (enteredOtp.length !== 6) {
+      setError('Please enter all 6 digits of the WhatsApp verification code');
       return;
     }
     setError('');
     setIsLoading(true);
 
-    const cleanPhone = phoneNumber.replace(/\D/g, '');
+    const cleanPhone = phoneNumber.replace(/\D/g, '').slice(-10);
     const formattedPhone = `+91 ${cleanPhone}`;
 
     try {
+      // 1. Verify real WhatsApp OTP with backend
+      const verifyRes = await verifyCustomerOtp({
+        mobileNumber: cleanPhone,
+        otp: enteredOtp,
+        name: matchedAccount?.name || fullName || 'Customer'
+      });
+
+      if (!verifyRes || verifyRes.error) {
+        setIsLoading(false);
+        setError(verifyRes?.error || 'Invalid or expired OTP code. Please try again.');
+        return;
+      }
+
       let account = matchedAccount;
 
       // Direct check in Supabase if not matched earlier
@@ -573,7 +601,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialSte
         const newCustId = `cust-${Date.now()}`;
         const newRecord = {
           id: newCustId,
-          name: `Shopper (+91 ${cleanPhone.slice(-4)})`,
+          name: fullName.trim() || `Shopper (+91 ${cleanPhone.slice(-4)})`,
           email: `${cleanPhone}@mobile.kirana`,
           phone: formattedPhone,
           location: 'Kothapet, Hyderabad',
@@ -599,7 +627,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialSte
       }
     } catch (err) {
       setIsLoading(false);
-      setError('Error verifying code. Please try again.');
+      setError(err?.message || 'Error verifying code. Please try again.');
     }
   };
 
@@ -608,15 +636,30 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialSte
     verifyPhoneOtpCode();
   };
 
-  const handleResendPhoneOtp = () => {
+  const handleResendPhoneOtp = async () => {
     if (!canResend || isLoading) return;
-    const cleanPhone = phoneNumber.replace(/\D/g, '');
-    const newCode = String(Math.floor(1000 + Math.random() * 9000));
-    setGeneratedPhoneOtp(newCode);
-    setTimer(30);
-    setCanResend(false);
-    setPhoneSentNotice(`Fresh OTP code sent: ${newCode}`);
-    if (showNotice) showNotice(`New OTP code sent: ${newCode}`);
+    const cleanPhone = phoneNumber.replace(/\D/g, '').slice(-10);
+    setIsLoading(true);
+    try {
+      const res = await sendCustomerOtp({
+        mobileNumber: cleanPhone,
+        name: matchedAccount?.name || fullName || 'Customer'
+      });
+      setIsLoading(false);
+      if (res && res.error) {
+        setError(res.error);
+        return;
+      }
+      setTimer(30);
+      setCanResend(false);
+      setPhoneSentNotice(`Fresh WhatsApp OTP sent to +91 ${cleanPhone}`);
+      if (showNotice) showNotice(`Fresh WhatsApp OTP sent to +91 ${cleanPhone}`);
+    } catch (err) {
+      setIsLoading(false);
+      setTimer(30);
+      setCanResend(false);
+      setPhoneSentNotice(`Fresh OTP sent to +91 ${cleanPhone}`);
+    }
   };
 
   const handleGoogleLogin = async () => {
@@ -858,19 +901,19 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialSte
   const handlePhoneOtpPaste = (e) => {
     e.preventDefault();
     const raw = e.clipboardData.getData('text').trim();
-    const digitsOnly = raw.replace(/\D/g, '').slice(0, 4);
+    const digitsOnly = raw.replace(/\D/g, '').slice(0, 6);
     if (digitsOnly) {
-      const newOtp = ['', '', '', ''];
+      const newOtp = ['', '', '', '', '', ''];
       for (let i = 0; i < digitsOnly.length; i++) {
         newOtp[i] = digitsOnly[i];
       }
       setOtp(newOtp);
       setError('');
-      const focusIdx = Math.min(digitsOnly.length, 3);
+      const focusIdx = Math.min(digitsOnly.length, 5);
       const el = document.getElementById(`modal-otp-${focusIdx}`);
       if (el) el.focus();
 
-      if (digitsOnly.length === 4) {
+      if (digitsOnly.length === 6) {
         setTimeout(() => {
           verifyPhoneOtpCode(digitsOnly);
         }, 150);
@@ -885,15 +928,15 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialSte
     setOtp(newOtp);
     setError('');
 
-    if (val && index < 3) {
+    if (val && index < 5) {
       const nextInput = document.getElementById(`modal-otp-${index + 1}`);
       if (nextInput) nextInput.focus();
     }
 
-    // Auto verify if all 4 digits entered
-    if (val && index === 3) {
+    // Auto verify if all 6 digits entered
+    if (val && index === 5) {
       const fullCode = newOtp.join('');
-      if (fullCode.length === 4 && !newOtp.includes('')) {
+      if (fullCode.length === 6 && !newOtp.includes('')) {
         setTimeout(() => {
           verifyPhoneOtpCode(fullCode);
         }, 150);
@@ -1657,10 +1700,10 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialSte
                         </div>
                         <div className="flex-1 text-[11px] leading-relaxed">
                           <span className="font-bold text-emerald-950 block">
-                            4-Digit Verification Code Sent
+                            WhatsApp 6-Digit Code Sent
                           </span>
                           <p className="text-emerald-900 mt-0.5">
-                            Enter the 4-digit code below or tap the quick-fill button to sign in automatically!
+                            Check your WhatsApp messages on +91 {phoneNumber.replace(/\D/g, '').slice(-10)} and enter the 6-digit code below.
                           </p>
                         </div>
                       </div>
@@ -1668,9 +1711,9 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialSte
                   )}
 
                   <form onSubmit={handleVerifyOtp} className="mt-5 space-y-4">
-                    {/* 4 Digit OTP Boxes */}
+                    {/* 6 Digit WhatsApp OTP Boxes */}
                     <div 
-                      className="flex justify-center items-center gap-2.5 sm:gap-3.5 max-w-[280px] mx-auto"
+                      className="flex justify-center items-center gap-1.5 sm:gap-2.5 max-w-[340px] mx-auto"
                       onPaste={handlePhoneOtpPaste}
                     >
                       {otp.map((digit, idx) => (
@@ -1683,8 +1726,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialSte
                           value={digit}
                           onChange={(e) => handleOtpChange(idx, e.target.value)}
                           onKeyDown={(e) => handleOtpKeyDown(idx, e)}
-                          style={{ width: '54px', height: '58px' }}
-                          className="w-[50px] sm:w-[56px] h-[56px] text-center text-2xl font-bold rounded-[16px] border border-black/[0.1] focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/15 focus:outline-none bg-[#f5f5f7] focus:bg-white text-[#1d1d1f] transition-all duration-200 shadow-2xs shrink-0"
+                          className="w-10 sm:w-11 h-12 sm:h-13 text-center text-xl sm:text-2xl font-bold rounded-xl sm:rounded-2xl border border-black/[0.1] focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/15 focus:outline-none bg-[#f5f5f7] focus:bg-white text-[#1d1d1f] transition-all duration-200 shadow-2xs shrink-0"
                           autoFocus={idx === 0}
                         />
                       ))}
@@ -1696,22 +1738,11 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialSte
                       </p>
                     )}
 
-                    {/* Resend & Quick Auto-fill OTP Helpers */}
+                    {/* Resend WhatsApp OTP Timer */}
                     <div className="flex flex-col items-center gap-2 pt-1">
-                      <button
-                        type="button"
-                        onClick={handleFillDemoOtp}
-                        className="text-xs text-emerald-800 hover:text-emerald-950 font-bold bg-emerald-50 hover:bg-emerald-100/90 border border-emerald-200/90 px-3.5 py-2 rounded-full transition-all duration-200 cursor-pointer flex items-center gap-2 shadow-2xs"
-                        title="Click to fill code and sign in instantly"
-                      >
-                        <KeyRound className="w-3.5 h-3.5 text-emerald-600" />
-                        <span>Code: <strong className="font-mono text-sm tracking-wider text-emerald-950">{generatedPhoneOtp}</strong></span>
-                        <span className="text-[10px] text-emerald-700 font-semibold underline underline-offset-2 ml-0.5">Tap to fill &amp; sign in</span>
-                      </button>
-
                       <div className="text-[11px] text-[#86868b] mt-1">
                         {timer > 0 ? (
-                          <span>Resend OTP in <strong className="text-[#1d1d1f] font-semibold">{timer}s</strong></span>
+                          <span>Resend code via WhatsApp in <strong className="text-[#1d1d1f] font-semibold">{timer}s</strong></span>
                         ) : (
                           <button
                             type="button"
@@ -1720,7 +1751,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialSte
                             className="text-xs text-emerald-700 hover:text-emerald-800 font-bold hover:underline cursor-pointer flex items-center gap-1.5"
                           >
                             <RotateCw className={`w-3 h-3 ${isLoading ? 'animate-spin' : ''}`} />
-                            <span>Resend Code</span>
+                            <span>Resend WhatsApp Code</span>
                           </button>
                         )}
                       </div>
