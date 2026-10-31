@@ -91,45 +91,6 @@ export default function App() {
     }
     return null;
   });
-  const [cartItems, setCartItems] = useState(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const saved = localStorage.getItem('kirana_cart_items');
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          if (parsed && typeof parsed === 'object') return parsed;
-        }
-      } catch (err) {
-        console.warn('Failed to load cart from localStorage:', err);
-      }
-    }
-    return {};
-  });
-
-  // Sync cart items with localStorage
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        localStorage.setItem('kirana_cart_items', JSON.stringify(cartItems));
-      } catch (err) {
-        console.warn('Failed to save cart to localStorage:', err);
-      }
-    }
-  }, [cartItems]);
-  const [isCartOpen, setIsCartOpen] = useState(false);
-  const [welcomeActive, setWelcomeActive] = useState(false);
-
-  const [isLoginOpen, setIsLoginOpen] = useState(false);
-  const [loginModalMode, setLoginModalMode] = useState('input');
-
-  const handleOpenLogin = () => {
-    setLoginModalMode('input');
-    setIsLoginOpen(true);
-  };
-
-  const handleReplayWelcome = () => {
-    setWelcomeActive(true);
-  };
   const [user, setUser] = useState(() => {
     if (typeof window !== 'undefined') {
       try {
@@ -150,6 +111,62 @@ export default function App() {
     }
     return null;
   });
+
+  const [cartItems, setCartItems] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        // If there is no logged-in user, do not load lingering cart items from previous sessions
+        const currentUser = localStorage.getItem('kirana_current_user');
+        if (!currentUser) {
+          localStorage.removeItem('kirana_cart_items');
+          return {};
+        }
+        const saved = localStorage.getItem('kirana_cart_items');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (parsed && typeof parsed === 'object') return parsed;
+        }
+      } catch (err) {
+        console.warn('Failed to load cart from localStorage:', err);
+      }
+    }
+    return {};
+  });
+
+  // Sync cart items with localStorage (and persist user-scoped cart when logged in)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        if (!user) {
+          // If no user is active, remove cart from active session
+          localStorage.removeItem('kirana_cart_items');
+        } else {
+          localStorage.setItem('kirana_cart_items', JSON.stringify(cartItems));
+          const userKey = user.id || user.userId || user.email || user.phone;
+          if (userKey) {
+            localStorage.setItem(`kirana_saved_cart_${userKey}`, JSON.stringify(cartItems));
+          }
+        }
+      } catch (err) {
+        console.warn('Failed to save cart to localStorage:', err);
+      }
+    }
+  }, [cartItems, user]);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [welcomeActive, setWelcomeActive] = useState(false);
+
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [loginModalMode, setLoginModalMode] = useState('input');
+  const [pendingProduct, setPendingProduct] = useState(null);
+
+  const handleOpenLogin = () => {
+    setLoginModalMode('input');
+    setIsLoginOpen(true);
+  };
+
+  const handleReplayWelcome = () => {
+    setWelcomeActive(true);
+  };
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [feedbackNotice, setFeedbackNotice] = useState(null);
@@ -304,14 +321,27 @@ export default function App() {
       try {
         recordUserLogout(user);
       } catch (_) {}
+      // Safely preserve user's cart in user-scoped storage so their cart is saved for their account
+      const userKey = user.id || user.userId || user.email || user.phone;
+      if (userKey && cartItems && Object.keys(cartItems).length > 0) {
+        try {
+          localStorage.setItem(`kirana_saved_cart_${userKey}`, JSON.stringify(cartItems));
+        } catch (_) {}
+      }
     }
     try {
       await supabase.auth.signOut();
     } catch (_) {}
+
+    // Immediately clear active user session and cart
     setUser(null);
+    setCartItems({});
+    setIsCartOpen(false);
+
     if (typeof window !== 'undefined') {
       try {
         localStorage.removeItem('kirana_current_user');
+        localStorage.removeItem('kirana_cart_items');
       } catch (_) {}
     }
     showNotice('Signed out successfully');
@@ -324,9 +354,18 @@ export default function App() {
       const payload = e?.detail;
       if (user) {
         if (!payload?.sessionId || payload.sessionId === user.sessionId || payload.sessionId === user.email || payload.sessionId === user.phone) {
+          const userKey = user.id || user.userId || user.email || user.phone;
+          if (userKey && cartItems && Object.keys(cartItems).length > 0) {
+            try {
+              localStorage.setItem(`kirana_saved_cart_${userKey}`, JSON.stringify(cartItems));
+            } catch (_) {}
+          }
           setUser(null);
+          setCartItems({});
+          setIsCartOpen(false);
           try {
             localStorage.removeItem('kirana_current_user');
+            localStorage.removeItem('kirana_cart_items');
           } catch (_) {}
           showNotice('Your session was ended by admin');
           navigateTo('home');
@@ -335,7 +374,7 @@ export default function App() {
     };
     window.addEventListener('kirana_remote_logout', handleRemoteLogout);
     return () => window.removeEventListener('kirana_remote_logout', handleRemoteLogout);
-  }, [user]);
+  }, [user, cartItems]);
 
   // Real-time Presence Tracking for active user
   useEffect(() => {
@@ -412,6 +451,13 @@ export default function App() {
   };
 
   const handleAddToCart = (product) => {
+    if (!user) {
+      setPendingProduct(product);
+      showNotice('Please log in or continue as guest to add items to cart');
+      handleOpenLogin();
+      return;
+    }
+
     const liveProduct = storeProducts.find((p) => p.id === product.id) || product;
     // Check stock availability
     if (liveProduct.stock === 0 || liveProduct.stockStatus === 'out_of_stock') {
@@ -739,9 +785,9 @@ export default function App() {
         onAdminClick={handleAdminClick}
       />
 
-      {/* Floating Cart Button (Desktop/Tablet) */}
+      {/* Floating Cart Button (Desktop/Tablet) - Only visible when user is logged in and cart has items */}
       <AnimatePresence>
-        {totalCartCount > 0 && (
+        {user && totalCartCount > 0 && (
           <motion.aside 
             key="floating-cart-summary"
             initial={{ opacity: 0, scale: 0.95, y: 16 }}
@@ -824,6 +870,39 @@ export default function App() {
             try {
               localStorage.setItem('kirana_current_user', JSON.stringify(userData));
             } catch (_) {}
+
+            // Restore any previously saved cart for this user
+            const userKey = userData.id || userData.userId || userData.email || userData.phone;
+            let loadedCart = {};
+            if (userKey) {
+              try {
+                const savedUserCart = localStorage.getItem(`kirana_saved_cart_${userKey}`);
+                if (savedUserCart) {
+                  const parsed = JSON.parse(savedUserCart);
+                  if (parsed && typeof parsed === 'object') {
+                    loadedCart = parsed;
+                  }
+                }
+              } catch (_) {}
+            }
+
+            // If user clicked + Add before logging in, automatically add that item now
+            if (pendingProduct) {
+              const liveProduct = storeProducts.find((p) => p.id === pendingProduct.id) || pendingProduct;
+              const currentQty = loadedCart[liveProduct.id]?.quantity || 0;
+              loadedCart = {
+                ...loadedCart,
+                [liveProduct.id]: { product: liveProduct, quantity: currentQty + 1 }
+              };
+              setPendingProduct(null);
+              showNotice(`Added ${liveProduct.name} to cart`);
+            }
+
+            setCartItems(loadedCart);
+            try {
+              localStorage.setItem('kirana_cart_items', JSON.stringify(loadedCart));
+            } catch (_) {}
+
             if (window.location.hash === '#welcome' || window.location.hash === '#/welcome') {
               window.history.replaceState(null, '', window.location.pathname + (window.location.search || ''));
             }
