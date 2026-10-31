@@ -277,11 +277,16 @@ export default function App() {
         u.user_metadata?.name || 
         (emailPrefix ? emailPrefix.charAt(0).toUpperCase() + emailPrefix.slice(1) : 'Shopper');
       
+      const isGoogle = u.app_metadata?.provider === 'google' || Boolean(u.user_metadata?.iss?.includes('google'));
+
       const sessionUser = {
         name,
         email: userEmail,
         userId: u.id,
-        method: 'email_otp'
+        method: isGoogle ? 'google' : 'email_otp',
+        type: isGoogle ? 'Google Verified Customer' : 'Verified Customer',
+        isGoogle: isGoogle,
+        avatar: u.user_metadata?.avatar_url || u.user_metadata?.picture || ''
       };
 
       try {
@@ -294,7 +299,7 @@ export default function App() {
         localStorage.setItem('kirana_current_user', JSON.stringify(fullUser));
         setIsLoginOpen(false);
         setWelcomeActive(true);
-        showNotice(`Welcome, ${name}! Signed in via email.`);
+        showNotice(isGoogle ? `Welcome, ${name}! Signed in with Google.` : `Welcome, ${name}! Signed in via email.`);
         // Clean URL hash so it doesn't re-trigger on subsequent reloads
         if (window.history?.replaceState) {
           window.history.replaceState(null, '', window.location.pathname);
