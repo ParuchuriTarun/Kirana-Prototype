@@ -36,6 +36,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialSte
   const [canResend, setCanResend] = useState(false);
   const [generatedPhoneOtp, setGeneratedPhoneOtp] = useState('1234');
   const [matchedAccount, setMatchedAccount] = useState(null);
+  const [phoneSentNotice, setPhoneSentNotice] = useState('');
 
   // Email state & Email OTP state (Real Supabase Auth to Gmail)
   const [email, setEmail] = useState('');
@@ -143,6 +144,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialSte
         setOtp(['', '', '', '']);
         setGeneratedPhoneOtp('1234');
         setMatchedAccount(null);
+        setPhoneSentNotice('');
         setError('');
         setIsLoading(false);
       }, 300);
@@ -195,6 +197,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialSte
     setOtp(['', '', '', '']);
     setTimer(30);
     setCanResend(false);
+    setPhoneSentNotice(`Verification code sent to +91 ${cleanPhone}`);
     if (showNotice) {
       showNotice(`OTP code sent: ${generatedCode}`);
     }
@@ -471,11 +474,10 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialSte
     verifyEmailOtpCode();
   };
 
-  const handleVerifyOtp = async (e) => {
-    if (e) e.preventDefault();
-    const enteredOtp = otp.join('');
+  const verifyPhoneOtpCode = async (tokenCode) => {
+    const enteredOtp = (tokenCode || otp.join('')).trim();
     if (enteredOtp.length !== 4) {
-      setError('Please enter the 4-digit code');
+      setError('Please enter all 4 digits of the verification code');
       return;
     }
     if (enteredOtp !== generatedPhoneOtp && enteredOtp !== '1234') {
@@ -517,8 +519,6 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialSte
         } catch (_) {}
       }
 
-      setIsLoading(false);
-
       if (account) {
         // Registered account found! Directly log in to this existing registered account
         const accountUser = {
@@ -535,13 +535,43 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialSte
           totalOrders: account.totalOrders || 0,
           totalSpent: account.totalSpent || 0
         };
+
+        // Update lastActive status in Supabase
+        try {
+          await supabase.from('customers').update({
+            lastActive: 'Just now',
+            status: 'Active'
+          }).eq('id', account.id);
+        } catch (_) {}
+
+        setIsLoading(false);
         completeLogin(accountUser);
       } else {
-        // New user registration
-        completeLogin({
+        // New user registration - insert into Supabase so account is registered permanently
+        const newCustId = `cust-${Date.now()}`;
+        const newRecord = {
+          id: newCustId,
           name: `Shopper (+91 ${cleanPhone.slice(-4)})`,
-          phone: formattedPhone,
           email: `${cleanPhone}@mobile.kirana`,
+          phone: formattedPhone,
+          location: 'Kothapet, Hyderabad',
+          type: 'Verified Customer',
+          avatar: '',
+          totalOrders: 0,
+          totalSpent: 0,
+          registeredDate: new Date().toISOString().split('T')[0],
+          lastActive: 'Just now',
+          status: 'Active'
+        };
+
+        try {
+          await supabase.from('customers').insert([newRecord]);
+        } catch (_) {}
+
+        setIsLoading(false);
+        completeLogin({
+          ...newRecord,
+          userId: newCustId,
           method: 'mobile_otp'
         });
       }
@@ -549,6 +579,22 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialSte
       setIsLoading(false);
       setError('Error verifying code. Please try again.');
     }
+  };
+
+  const handleVerifyOtp = (e) => {
+    if (e) e.preventDefault();
+    verifyPhoneOtpCode();
+  };
+
+  const handleResendPhoneOtp = () => {
+    if (!canResend || isLoading) return;
+    const cleanPhone = phoneNumber.replace(/\D/g, '');
+    const newCode = String(Math.floor(1000 + Math.random() * 9000));
+    setGeneratedPhoneOtp(newCode);
+    setTimer(30);
+    setCanResend(false);
+    setPhoneSentNotice(`Fresh OTP code sent: ${newCode}`);
+    if (showNotice) showNotice(`New OTP code sent: ${newCode}`);
   };
 
   const handleGoogleLogin = () => {
@@ -726,14 +772,49 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialSte
     onClose();
   };
 
+  const handlePhoneOtpPaste = (e) => {
+    e.preventDefault();
+    const raw = e.clipboardData.getData('text').trim();
+    const digitsOnly = raw.replace(/\D/g, '').slice(0, 4);
+    if (digitsOnly) {
+      const newOtp = ['', '', '', ''];
+      for (let i = 0; i < digitsOnly.length; i++) {
+        newOtp[i] = digitsOnly[i];
+      }
+      setOtp(newOtp);
+      setError('');
+      const focusIdx = Math.min(digitsOnly.length, 3);
+      const el = document.getElementById(`modal-otp-${focusIdx}`);
+      if (el) el.focus();
+
+      if (digitsOnly.length === 4) {
+        setTimeout(() => {
+          verifyPhoneOtpCode(digitsOnly);
+        }, 150);
+      }
+    }
+  };
+
   const handleOtpChange = (index, val) => {
     if (!/^\d*$/.test(val)) return;
     const newOtp = [...otp];
     newOtp[index] = val.slice(-1);
     setOtp(newOtp);
+    setError('');
+
     if (val && index < 3) {
       const nextInput = document.getElementById(`modal-otp-${index + 1}`);
       if (nextInput) nextInput.focus();
+    }
+
+    // Auto verify if all 4 digits entered
+    if (val && index === 3) {
+      const fullCode = newOtp.join('');
+      if (fullCode.length === 4 && !newOtp.includes('')) {
+        setTimeout(() => {
+          verifyPhoneOtpCode(fullCode);
+        }, 150);
+      }
     }
   };
 
@@ -753,6 +834,9 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialSte
     const code = generatedPhoneOtp || '1234';
     setOtp(code.split(''));
     setError('');
+    setTimeout(() => {
+      verifyPhoneOtpCode(code);
+    }, 150);
   };
 
   const stepTransition = { duration: 0.28, ease: [0.22, 1, 0.36, 1] };
@@ -1378,7 +1462,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialSte
                 </motion.div>
               )}
 
-              {/* STEP 2: OTP Verification Screen */}
+              {/* STEP 2: Phone OTP Verification Screen */}
               {step === 'otp' && (
                 <motion.div
                   key="step-otp"
@@ -1389,29 +1473,50 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialSte
                 >
                   <button
                     type="button"
-                    onClick={() => setStep('input')}
+                    onClick={() => {
+                      setStep('input');
+                      setError('');
+                    }}
                     className="inline-flex items-center gap-1 text-xs text-[#86868b] hover:text-[#1d1d1f] font-medium mb-3 cursor-pointer"
                   >
                     <ArrowLeft className="w-3.5 h-3.5" />
-                    <span>Back to sign in</span>
+                    <span>Back to phone number</span>
                   </button>
 
                   <div className="w-12 h-12 rounded-[16px] bg-emerald-50 text-emerald-600 flex items-center justify-center mb-3">
-                    <Shield className="w-6 h-6 stroke-[1.8]" />
+                    <Smartphone className="w-6 h-6 stroke-[1.8]" />
                   </div>
 
                   <h3 className="text-xl font-bold text-[#1d1d1f] tracking-tight font-sans">
-                    Verification Code
+                    Enter Verification Code
                   </h3>
                   <p className="text-xs text-[#86868b] mt-1 leading-relaxed">
                     Sent 4-digit code to{' '}
                     <strong className="text-[#1d1d1f] font-semibold">
                       +91 {phoneNumber}
                     </strong>
+                    <button
+                      type="button"
+                      onClick={() => setStep('input')}
+                      className="text-emerald-700 hover:text-emerald-800 font-semibold underline ml-1.5 cursor-pointer"
+                    >
+                      Change
+                    </button>
                   </p>
 
-                  {matchedAccount && (
-                    <div className="mt-3 px-3.5 py-2.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-950 text-xs flex items-center gap-2.5 text-left">
+                  {phoneSentNotice && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-[11px] font-semibold flex items-center gap-2 mt-3"
+                    >
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>{phoneSentNotice}</span>
+                    </motion.div>
+                  )}
+
+                  {matchedAccount ? (
+                    <div className="mt-3 px-3.5 py-2.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-950 text-xs flex items-center gap-2.5 text-left shadow-2xs">
                       <div className="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-[11px] shrink-0">
                         ✓
                       </div>
@@ -1420,15 +1525,38 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialSte
                           Registered Account: {matchedAccount.name}
                         </span>
                         <span className="text-[11px] text-emerald-700 block mt-0.5">
-                          You will be logged directly into your existing profile.
+                          You will be logged directly into your existing profile &amp; orders.
                         </span>
                       </div>
                     </div>
+                  ) : (
+                    <motion.div
+                      initial={{ opacity: 0, y: -4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="p-3 rounded-2xl bg-emerald-50/80 border border-emerald-200/90 text-emerald-950 text-xs mt-3 shadow-2xs"
+                    >
+                      <div className="flex items-start gap-2.5">
+                        <div className="w-6 h-6 rounded-lg bg-emerald-200/80 text-emerald-900 flex items-center justify-center shrink-0 mt-0.5">
+                          <Smartphone className="w-3.5 h-3.5" />
+                        </div>
+                        <div className="flex-1 text-[11px] leading-relaxed">
+                          <span className="font-bold text-emerald-950 block">
+                            4-Digit Verification Code Sent
+                          </span>
+                          <p className="text-emerald-900 mt-0.5">
+                            Enter the 4-digit code below or tap the quick-fill button to sign in automatically!
+                          </p>
+                        </div>
+                      </div>
+                    </motion.div>
                   )}
 
                   <form onSubmit={handleVerifyOtp} className="mt-5 space-y-4">
                     {/* 4 Digit OTP Boxes */}
-                    <div className="flex justify-between gap-3 max-w-[260px] mx-auto">
+                    <div 
+                      className="flex justify-center items-center gap-2.5 sm:gap-3.5 max-w-[280px] mx-auto"
+                      onPaste={handlePhoneOtpPaste}
+                    >
                       {otp.map((digit, idx) => (
                         <input
                           key={idx}
@@ -1439,7 +1567,8 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialSte
                           value={digit}
                           onChange={(e) => handleOtpChange(idx, e.target.value)}
                           onKeyDown={(e) => handleOtpKeyDown(idx, e)}
-                          className="w-13 h-14 text-center text-2xl font-bold rounded-[16px] border border-black/[0.1] focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/15 focus:outline-none bg-[#f5f5f7] focus:bg-white text-[#1d1d1f] transition-all duration-200 shadow-2xs"
+                          style={{ width: '54px', height: '58px' }}
+                          className="w-[50px] sm:w-[56px] h-[56px] text-center text-2xl font-bold rounded-[16px] border border-black/[0.1] focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/15 focus:outline-none bg-[#f5f5f7] focus:bg-white text-[#1d1d1f] transition-all duration-200 shadow-2xs shrink-0"
                           autoFocus={idx === 0}
                         />
                       ))}
@@ -1451,17 +1580,17 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialSte
                       </p>
                     )}
 
-                    {/* Resend & Auto-fill OTP Helpers */}
+                    {/* Resend & Quick Auto-fill OTP Helpers */}
                     <div className="flex flex-col items-center gap-2 pt-1">
                       <button
                         type="button"
                         onClick={handleFillDemoOtp}
-                        className="text-xs text-emerald-800 hover:text-emerald-950 font-bold bg-emerald-50 hover:bg-emerald-100/80 border border-emerald-200/90 px-3.5 py-2 rounded-full transition-all duration-200 cursor-pointer flex items-center gap-2 shadow-2xs"
-                        title="Click to auto-fill code"
+                        className="text-xs text-emerald-800 hover:text-emerald-950 font-bold bg-emerald-50 hover:bg-emerald-100/90 border border-emerald-200/90 px-3.5 py-2 rounded-full transition-all duration-200 cursor-pointer flex items-center gap-2 shadow-2xs"
+                        title="Click to fill code and sign in instantly"
                       >
                         <KeyRound className="w-3.5 h-3.5 text-emerald-600" />
                         <span>Code: <strong className="font-mono text-sm tracking-wider text-emerald-950">{generatedPhoneOtp}</strong></span>
-                        <span className="text-[10px] text-emerald-700 font-semibold underline underline-offset-2 ml-0.5">Tap to fill</span>
+                        <span className="text-[10px] text-emerald-700 font-semibold underline underline-offset-2 ml-0.5">Tap to fill &amp; sign in</span>
                       </button>
 
                       <div className="text-[11px] text-[#86868b] mt-1">
@@ -1470,16 +1599,11 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialSte
                         ) : (
                           <button
                             type="button"
-                            onClick={() => {
-                              const newCode = String(Math.floor(1000 + Math.random() * 9000));
-                              setGeneratedPhoneOtp(newCode);
-                              setTimer(30);
-                              setCanResend(false);
-                              if (showNotice) showNotice(`New OTP code sent: ${newCode}`);
-                            }}
-                            className="text-emerald-700 hover:text-emerald-800 font-semibold cursor-pointer flex items-center gap-1"
+                            onClick={handleResendPhoneOtp}
+                            disabled={isLoading}
+                            className="text-xs text-emerald-700 hover:text-emerald-800 font-bold hover:underline cursor-pointer flex items-center gap-1.5"
                           >
-                            <RotateCw className="w-3 h-3" />
+                            <RotateCw className={`w-3 h-3 ${isLoading ? 'animate-spin' : ''}`} />
                             <span>Resend Code</span>
                           </button>
                         )}
@@ -1492,12 +1616,18 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialSte
                       whileHover={{ scale: 1.01 }}
                       whileTap={{ scale: 0.98 }}
                       transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                      className="w-full py-3.5 px-4 bg-emerald-700 hover:bg-emerald-800 text-white text-sm font-semibold rounded-full shadow-sm transition-all duration-200 cursor-pointer flex items-center justify-center gap-2"
+                      className="w-full py-3.5 px-4 bg-emerald-700 hover:bg-emerald-800 text-white text-sm font-semibold rounded-full shadow-sm hover:shadow-emerald-700/20 transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70 mt-2"
                     >
                       {isLoading ? (
-                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        <div className="flex items-center gap-2">
+                          <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          <span>Verifying OTP code...</span>
+                        </div>
                       ) : (
-                        <span>Verify &amp; Log In</span>
+                        <>
+                          <span>Verify &amp; Log In</span>
+                          <Check className="w-4 h-4 stroke-[2.5]" />
+                        </>
                       )}
                     </motion.button>
                   </form>
