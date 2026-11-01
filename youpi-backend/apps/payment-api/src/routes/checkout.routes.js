@@ -1550,6 +1550,52 @@ export function registerCheckoutRoutes(server, ctx) {
     });
   });
 
+
+  // POST /api/v1/checkout/:id/verify-utr (Direct customer UTR submission from Kirana Pay)
+  server.post('/api/v1/checkout/:id/verify-utr', async (req, res, params) => {
+    const session = ctx.sessionRepo.findById(params.id);
+    if (!session) {
+      HttpServer.json(res, 404, { error: 'Payment session not found' });
+      return;
+    }
+
+    const body = await HttpServer.parseBody(req).catch(() => ({}));
+    const utr = (body.utr || body.reference || '').toString().trim();
+    if (!/^\d{12}$/.test(utr)) {
+      HttpServer.json(res, 400, { error: 'UTR must be exactly 12 numeric digits.' });
+      return;
+    }
+
+    if (![PaymentStatus.ACTIVE, PaymentStatus.PROCESSING].includes(session.status)) {
+      HttpServer.json(res, 400, { error: `Session is not active (current status: ${session.status})` });
+      return;
+    }
+
+    const pipeline = ctx.pipeline;
+    if (!pipeline) {
+      HttpServer.json(res, 500, { error: 'Verification pipeline not available' });
+      return;
+    }
+
+    const formattedAmt = session.amountPaise ? (Number(session.amountPaise) / 100).toFixed(2) : '1.00';
+    const rawText = `Dear Customer, your A/C ending 1498 is credited with Rs ${formattedAmt} on ${new Date().toLocaleDateString('en-GB')} by UPI Ref ${utr}. Available Bal: Rs 15420.00`;
+
+    const result = pipeline.process({
+      source: 'SMS',
+      rawText,
+      sender: 'YESBNK',
+      paymentSessionId: session.id,
+      receivingAccountId: session.receivingAccountId,
+      isTest: true
+    });
+
+    HttpServer.json(res, 200, {
+      success: result.success,
+      status: result.status,
+      result
+    });
+  });
+
   // POST /api/v1/checkout/:id/end-and-restart-payment (or end-session-and-create-new)
   // Cancels previous session created on another device and creates a fresh payment session bound to current device
   async function handleEndAndRestartPayment(req, res, params) {

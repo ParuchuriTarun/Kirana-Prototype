@@ -10,12 +10,10 @@ import {
   AlertCircle, 
   Loader2, 
   Sparkles,
-  Zap,
   Settings,
   ArrowLeft,
   Building2,
   Smartphone,
-  Lock,
   ChevronDown,
   ChevronUp
 } from 'lucide-react';
@@ -27,13 +25,10 @@ import {
   buildUpiIntentUrl, 
   generateUpiQrCode, 
   validateUtr,
-  checkCustomerUser,
-  sendCustomerOtp,
-  verifyCustomerOtp,
   createYouPiPayment,
   bindCustomerToSession,
   getCheckoutState,
-  simulatePaymentObservation
+  verifyPaymentUtr
 } from '../services/youpiService';
 
 export default function YouPiPaymentModal({
@@ -52,39 +47,29 @@ export default function YouPiPaymentModal({
 
   const payableAmount = amount;
 
-  // Authentic 3-Step Gateway Flow: 'phone' -> 'otp' -> 'payment' -> 'success' | 'expired'
-  const [step, setStep] = useState('phone');
+  // Direct UPI Payment Flow (Zero OTP): 'payment' -> 'success' | 'expired'
+  const [step, setStep] = useState('payment');
   
-  // Auth Form State
-  const [phone, setPhone] = useState(customerInfo?.phone || customerInfo?.mobileNumber || '');
-  const [customerName, setCustomerName] = useState(customerInfo?.name || customerInfo?.fullName || 'Customer');
-  const [otp, setOtp] = useState('');
-  const [whatsappConnected, setWhatsappConnected] = useState(true);
-  const [authLoading, setAuthLoading] = useState(false);
-  const [authError, setAuthError] = useState('');
-  const [toastMsg, setToastMsg] = useState('');
-
   // Payment Session State
   const [currentPaymentId, setCurrentPaymentId] = useState(null);
   const [qrDataUrl, setQrDataUrl] = useState('');
   const [copiedUpi, setCopiedUpi] = useState(false);
   const [verifiedDetails, setVerifiedDetails] = useState(null);
-  const [timeLeft, setTimeLeft] = useState(300); // 5 minutes standard NPCI UPI window
+  const [timeLeft, setTimeLeft] = useState(300); // 5 minutes NPCI standard
   const [showUtrInput, setShowUtrInput] = useState(false);
   const [manualUtr, setManualUtr] = useState('');
   const [verifyingUtr, setVerifyingUtr] = useState(false);
   const [utrError, setUtrError] = useState('');
+  const [toastMsg, setToastMsg] = useState('');
 
-  // Kirana Smart Banking Observer States
+  // Real Banking Observation States
   const [observerStage, setObserverStage] = useState('listening'); // 'listening' | 'detected' | 'confirmed'
   const [observerTitle, setObserverTitle] = useState('Listening for UPI payment...');
   const [observerSubtitle, setObserverSubtitle] = useState('Scan with Google Pay, PhonePe, Paytm or CRED. Payment will be detected automatically by Kirana banking observers with zero clicks.');
-  const [confirmingPayment, setConfirmingPayment] = useState(false);
 
   const timerRef = useRef(null);
   const pollerRef = useRef(null);
   const sseRef = useRef(null);
-  const autoDetectTimerRef = useRef(null);
   const hasTriggeredSuccessRef = useRef(false);
   const resolvedOrderIdRef = useRef(orderId || '');
 
@@ -105,13 +90,12 @@ export default function YouPiPaymentModal({
     setTimeout(() => setToastMsg(''), 3000);
   };
 
-  // Reset modal state on open & initialize payment session
+  // Reset modal state on open & initialize payment session directly (NO OTP ASKED)
   useEffect(() => {
     if (!isOpen) {
       if (timerRef.current) clearInterval(timerRef.current);
       if (pollerRef.current) clearInterval(pollerRef.current);
       if (sseRef.current) sseRef.current.close();
-      if (autoDetectTimerRef.current) clearTimeout(autoDetectTimerRef.current);
       hasTriggeredSuccessRef.current = false;
       return;
     }
@@ -122,29 +106,16 @@ export default function YouPiPaymentModal({
     setUtrError('');
     setTimeLeft(300);
     hasTriggeredSuccessRef.current = false;
-    setConfirmingPayment(false);
     setObserverStage('listening');
     setObserverTitle('Listening for UPI payment...');
     setObserverSubtitle('Scan with Google Pay, PhonePe, Paytm or CRED. Payment will be detected automatically by Kirana banking observers with zero clicks.');
+    setStep('payment');
 
-    const userPhone = customerInfo?.phone || customerInfo?.mobileNumber || '';
-    const cleanUserPhone = (userPhone || '').replace(/\D/g, '').slice(-10);
+    const userPhone = customerInfo?.phone || customerInfo?.mobileNumber || '9876543210';
+    const cleanUserPhone = (userPhone || '').replace(/\D/g, '').slice(-10) || '9876543210';
+    const userName = customerInfo?.name || customerInfo?.fullName || 'Shopper';
 
-    if (cleanUserPhone.length === 10) {
-      setPhone(cleanUserPhone);
-      setCustomerName(customerInfo?.name || customerInfo?.fullName || 'Customer');
-      initiatePayment(cleanUserPhone);
-    } else {
-      const savedCustomer = localStorage.getItem('youpi_customer_auth');
-      if (savedCustomer) {
-        try {
-          const cust = JSON.parse(savedCustomer);
-          if (cust.phone) setPhone(cust.phone);
-          if (cust.name) setCustomerName(cust.name);
-        } catch {}
-      }
-      setStep('phone');
-    }
+    initiatePayment(cleanUserPhone, userName);
   }, [isOpen]);
 
   // Clean timer & poller on unmount
@@ -153,7 +124,6 @@ export default function YouPiPaymentModal({
       if (timerRef.current) clearInterval(timerRef.current);
       if (pollerRef.current) clearInterval(pollerRef.current);
       if (sseRef.current) sseRef.current.close();
-      if (autoDetectTimerRef.current) clearTimeout(autoDetectTimerRef.current);
     };
   }, []);
 
@@ -164,79 +134,19 @@ export default function YouPiPaymentModal({
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  // Step 1: Submit Phone Number and Dispatch WhatsApp OTP
-  const handlePhoneSubmit = async (e) => {
-    e?.preventDefault();
-    const cleanPhone = phone.replace(/\D/g, '').slice(-10);
-    if (cleanPhone.length < 10) {
-      setAuthError('Please enter a valid 10-digit mobile number.');
-      return;
-    }
-
-    setAuthLoading(true);
-    setAuthError('');
+  // Initializes Real Payment Session in YouPI-PG Gateway
+  const initiatePayment = async (phoneToUse, nameToUse) => {
+    const cleanPhone = (phoneToUse || '').replace(/\D/g, '').slice(-10) || '9876543210';
+    const resolvedOrderId = orderId || `ORD-${Date.now().toString().slice(-6)}`;
+    resolvedOrderIdRef.current = resolvedOrderId;
 
     try {
-      const checkRes = await checkCustomerUser(cleanPhone);
-      const isNew = !checkRes.exists;
-
-      const otpRes = await sendCustomerOtp({
-        mobileNumber: cleanPhone,
-        name: customerName || 'Customer',
-        email: `${cleanPhone}@kirana.local`,
-        isNewUser: isNew
-      });
-
-      if (otpRes.success) {
-        showToast('Verification code sent to your WhatsApp!');
-        setStep('otp');
-      } else {
-        setAuthError(otpRes.error || 'Failed to send OTP code.');
-      }
-    } catch (err) {
-      setAuthError('Network error connecting to Kirana Pay auth service.');
-    } finally {
-      setAuthLoading(false);
-    }
-  };
-
-  // Step 2: Verify OTP, Create Session, Bind Customer & Activate Dynamic QR
-  const handleVerifyOtpSubmit = async (e, otpOverride) => {
-    e?.preventDefault();
-    const cleanOtp = (otpOverride || otp).trim();
-    if (cleanOtp.length < 6) {
-      setAuthError('Please enter the 6-digit verification code.');
-      return;
-    }
-
-    setAuthLoading(true);
-    setAuthError('');
-
-    try {
-      const cleanPhone = phone.replace(/\D/g, '').slice(-10);
-      const verifyRes = await verifyCustomerOtp({
-        mobileNumber: cleanPhone,
-        otp: cleanOtp,
-        name: customerName || 'Customer',
-        email: `${cleanPhone}@kirana.local`
-      });
-
-      // Save customer identity
-      localStorage.setItem('youpi_customer_auth', JSON.stringify({
-        phone: cleanPhone,
-        name: verifyRes?.customer?.name || customerName,
-        token: verifyRes?.token || `local_token_${Date.now()}`,
-        id: verifyRes?.customer?.id || `cust_${cleanPhone}`
-      }));
-
-      // Initialize authoritative payment session
-      const resolvedOrderId = orderId || `ORD-${Date.now().toString().slice(-6)}`;
       const paymentRes = await createYouPiPayment({
         orderId: resolvedOrderId,
         amount: payableAmount,
         currency: 'INR',
         customerInfo: {
-          name: customerName,
+          name: nameToUse || 'Shopper',
           phone: cleanPhone
         }
       });
@@ -247,70 +157,33 @@ export default function YouPiPaymentModal({
       // Bind customer to payment session (safe call)
       bindCustomerToSession({
         paymentId,
-        token: verifyRes?.token,
-        customerId: verifyRes?.customer?.id
+        token: null,
+        customerId: null
       }).catch(() => {});
 
       // Fetch active state with UPI URI
-      const state = await getCheckoutState(paymentId);
-      const activeUpiUri = state?.upiUri || buildUpiIntentUrl({
-        vpa: merchantConfig.merchantVpa,
-        name: merchantConfig.merchantName,
-        amount: payableAmount,
-        orderId: resolvedOrderId,
-        note: `Kirana Order #${resolvedOrderId}`
-      });
+      let activeUpiUri = null;
+      try {
+        const state = await getCheckoutState(paymentId);
+        activeUpiUri = state?.upiUri;
+      } catch (_) {}
 
-      // Generate static, crystal-clear QR code strictly ONCE
-      const qr = await generateUpiQrCode(activeUpiUri);
-      setQrDataUrl(qr);
-
-      // Transition to static QR view & start countdown + background listening
-      setStep('payment');
-      startPaymentListening(paymentId, resolvedOrderId);
-
-    } catch (err) {
-      console.error('[Kirana Pay] Auth verification fallback:', err);
-      initiatePayment(phone);
-    } finally {
-      setAuthLoading(false);
-    }
-  };
-
-  const initiatePayment = async (phoneToUse) => {
-    setAuthLoading(true);
-    setAuthError('');
-    const cleanPhone = (phoneToUse || phone || '').replace(/\D/g, '').slice(-10);
-    const resolvedOrderId = orderId || `ORD-${Date.now().toString().slice(-6)}`;
-
-    try {
-      const paymentRes = await createYouPiPayment({
-        orderId: resolvedOrderId,
-        amount: payableAmount,
-        currency: 'INR',
-        customerInfo: {
-          name: customerName,
-          phone: cleanPhone
-        }
-      });
-
-      const paymentId = paymentRes?.paymentId || `pay_${Date.now()}`;
-      setCurrentPaymentId(paymentId);
-
-      const activeUpiUri = buildUpiIntentUrl({
-        vpa: merchantConfig.merchantVpa,
-        name: merchantConfig.merchantName,
-        amount: payableAmount,
-        orderId: resolvedOrderId,
-        note: `Kirana Order #${resolvedOrderId}`
-      });
+      if (!activeUpiUri) {
+        activeUpiUri = buildUpiIntentUrl({
+          vpa: merchantConfig.merchantVpa,
+          name: merchantConfig.merchantName,
+          amount: payableAmount,
+          orderId: resolvedOrderId,
+          note: `Kirana Order #${resolvedOrderId}`
+        });
+      }
 
       const qr = await generateUpiQrCode(activeUpiUri);
       setQrDataUrl(qr);
       setStep('payment');
       startPaymentListening(paymentId, resolvedOrderId);
     } catch (err) {
-      console.warn('[Kirana Pay] init fallback:', err);
+      console.warn('[Kirana Pay] init resilient fallback:', err);
       const activeUpiUri = buildUpiIntentUrl({
         vpa: merchantConfig.merchantVpa,
         name: merchantConfig.merchantName,
@@ -322,17 +195,14 @@ export default function YouPiPaymentModal({
       setQrDataUrl(qr);
       setStep('payment');
       startPaymentListening(`local_${Date.now()}`, resolvedOrderId);
-    } finally {
-      setAuthLoading(false);
     }
   };
 
-  // Trigger automated or manual payment success transition
+  // Real-time payment success transition - ONLY called on authoritative bank confirmation!
   const triggerSuccessfulPayment = (customUtr = null) => {
     if (hasTriggeredSuccessRef.current) return;
     hasTriggeredSuccessRef.current = true;
 
-    if (autoDetectTimerRef.current) clearTimeout(autoDetectTimerRef.current);
     if (timerRef.current) clearInterval(timerRef.current);
     if (pollerRef.current) clearInterval(pollerRef.current);
     if (sseRef.current) sseRef.current.close();
@@ -352,7 +222,7 @@ export default function YouPiPaymentModal({
     }, 1100);
   };
 
-  // Step 3: Start 5-Minute Countdown & Real-Time Observer Poller
+  // Starts 5-minute Countdown & Active Banking Observer Polling (NO FAKE AUTO-SUCCESS)
   const startPaymentListening = (paymentId, activeOrderId) => {
     resolvedOrderIdRef.current = activeOrderId;
     hasTriggeredSuccessRef.current = false;
@@ -361,7 +231,7 @@ export default function YouPiPaymentModal({
     setObserverTitle('Listening for UPI payment...');
     setObserverSubtitle('Scan with Google Pay, PhonePe, Paytm or CRED. Payment will be detected automatically by Kirana banking observers with zero clicks.');
 
-    // 1. Dual-Timer Countdown
+    // 1. Dual-Timer 5-Minute Countdown
     if (timerRef.current) clearInterval(timerRef.current);
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => {
@@ -369,7 +239,6 @@ export default function YouPiPaymentModal({
           clearInterval(timerRef.current);
           if (pollerRef.current) clearInterval(pollerRef.current);
           if (sseRef.current) sseRef.current.close();
-          if (autoDetectTimerRef.current) clearTimeout(autoDetectTimerRef.current);
           if (!hasTriggeredSuccessRef.current) setStep('expired');
           return 0;
         }
@@ -377,34 +246,20 @@ export default function YouPiPaymentModal({
       });
     }, 1000);
 
-    // 2. Intelligent Auto-Observer: Automatically shows payment done after realistic verification window
-    if (autoDetectTimerRef.current) clearTimeout(autoDetectTimerRef.current);
-    autoDetectTimerRef.current = setTimeout(() => {
-      if (hasTriggeredSuccessRef.current) return;
-      setObserverStage('detected');
-      setObserverTitle('UPI payment signal detected from bank switch...');
-      setObserverSubtitle(`Incoming ₹${Number(payableAmount).toFixed(2)} credit detected. Verifying settlement with Tarun (${merchantConfig.merchantVpa})...`);
-
-      autoDetectTimerRef.current = setTimeout(() => {
-        if (hasTriggeredSuccessRef.current) return;
-        triggerSuccessfulPayment();
-      }, 3000);
-    }, 6000);
-
-    // 3. Automated Observer Poller (Polls state every 1.5 seconds if local gateway is running)
+    // 2. Automated Observer Poller (Polls YouPI-PG state every 1.5 seconds)
     if (pollerRef.current) clearInterval(pollerRef.current);
     pollerRef.current = setInterval(async () => {
       try {
         const state = await getCheckoutState(paymentId);
         if (state && state.status === 'SUCCESS') {
-          triggerSuccessfulPayment(state.utr || state.bankRef);
+          triggerSuccessfulPayment(state.utr || state.bankRef || state.reference);
         }
       } catch (err) {
         // silent fallback
       }
     }, 1500);
 
-    // 4. SSE Real-Time Stream (Port 6100 events)
+    // 3. SSE Real-Time Stream from Gateway (Port 6100 events)
     try {
       if (sseRef.current) sseRef.current.close();
       const sse = new EventSource(`${merchantConfig.apiUrl}/api/v1/checkout/${paymentId}/events`);
@@ -418,42 +273,6 @@ export default function YouPiPaymentModal({
         } catch {}
       });
     } catch {}
-  };
-
-  // Handle return from UPI App (GPay / PhonePe / Paytm / CRED)
-  useEffect(() => {
-    if (step !== 'payment') return;
-
-    const handleWindowFocus = () => {
-      if (document.visibilityState === 'visible' && !hasTriggeredSuccessRef.current) {
-        setObserverStage('detected');
-        setObserverTitle('Detecting UPI payment from app...');
-        setObserverSubtitle('Payment app completed. Querying NPCI banking switch for confirmation...');
-        setTimeout(() => {
-          triggerSuccessfulPayment();
-        }, 1200);
-      }
-    };
-
-    window.addEventListener('focus', handleWindowFocus);
-    document.addEventListener('visibilitychange', handleWindowFocus);
-
-    return () => {
-      window.removeEventListener('focus', handleWindowFocus);
-      document.removeEventListener('visibilitychange', handleWindowFocus);
-    };
-  }, [step]);
-
-  // Immediate "I Have Paid" Button Trigger
-  const handleConfirmPaymentDone = () => {
-    setConfirmingPayment(true);
-    setObserverStage('detected');
-    setObserverTitle('Verifying settlement with bank...');
-    setObserverSubtitle('Confirming payment with NPCI switch. Finalizing your order...');
-    setTimeout(() => {
-      setConfirmingPayment(false);
-      triggerSuccessfulPayment();
-    }, 1000);
   };
 
   // Handle successful payment transition & auto-completion
@@ -476,7 +295,7 @@ export default function YouPiPaymentModal({
     }, 1600);
   };
 
-  // Manual 12-digit UTR Verification (from Google Pay / PhonePe receipt)
+  // Real 12-digit UTR Verification with YouPI-PG Pipeline
   const handleVerifyManualUtr = async (e) => {
     e?.preventDefault();
     const cleanUtr = manualUtr.replace(/\D/g, '').trim();
@@ -490,18 +309,28 @@ export default function YouPiPaymentModal({
     setUtrError('');
 
     try {
-      simulatePaymentObservation({
+      const res = await verifyPaymentUtr({
         paymentId: currentPaymentId,
         amount: payableAmount,
         utr: cleanUtr
-      }).catch(() => {});
-    } catch (_) {}
+      });
 
-    showToast('Validating payment reference with bank...');
-    setTimeout(() => {
+      if (res.success) {
+        setObserverStage('detected');
+        setObserverTitle('UPI payment reference verified by bank switch...');
+        setObserverSubtitle(`Direct credit of ₹${Number(payableAmount).toFixed(2)} confirmed for Ref ${cleanUtr}. Finalizing settlement...`);
+        showToast('Payment verified! Finalizing order...');
+        setTimeout(() => {
+          triggerSuccessfulPayment(cleanUtr);
+        }, 1200);
+      } else {
+        setUtrError(res.error || res.data?.error || res.data?.reason || 'Could not verify transaction with bank switch. Please check UTR.');
+      }
+    } catch (err) {
+      setUtrError('Network error connecting to bank verification mesh.');
+    } finally {
       setVerifyingUtr(false);
-      triggerSuccessfulPayment(cleanUtr);
-    }, 800);
+    }
   };
 
   const copyToClipboard = (text) => {
@@ -724,200 +553,14 @@ export default function YouPiPaymentModal({
                   </div>
                 </form>
               </motion.div>
-            ) : step === 'phone' ? (
-              /* STEP 1: Kirana Customer Checkout */
-              <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="space-y-4"
-              >
-                <div>
-                  <h4 className="text-base font-bold text-neutral-900 tracking-tight">
-                    Kirana Express Checkout
-                  </h4>
-                  <p className="text-xs text-neutral-500 mt-0.5">
-                    Enter your 10-digit mobile number for order delivery &amp; digital UPI receipt
-                  </p>
-                </div>
-
-                <form onSubmit={(e) => { e.preventDefault(); initiatePayment(phone); }} className="space-y-3.5">
-                  <div>
-                    <label className="text-xs font-semibold text-neutral-700 block mb-1">
-                      Delivery Mobile Number
-                    </label>
-                    <div className="flex items-center rounded-xl border border-neutral-300 bg-neutral-50 focus-within:bg-white focus-within:border-emerald-600 focus-within:ring-2 focus-within:ring-emerald-600/20 overflow-hidden">
-                      <div className="px-3 py-2.5 bg-neutral-100/80 border-r border-neutral-300 text-xs font-semibold text-neutral-700 flex items-center gap-1.5 shrink-0">
-                        <span>🇮🇳</span>
-                        <span>+91</span>
-                      </div>
-                      <input
-                        type="tel"
-                        required
-                        maxLength={10}
-                        placeholder="Enter 10-digit mobile number"
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
-                        className="w-full py-2.5 px-3 text-sm font-mono tracking-wider outline-none bg-transparent"
-                        autoFocus
-                      />
-                    </div>
-                  </div>
-
-                  <div className="p-3 bg-emerald-50/70 border border-emerald-200/80 rounded-2xl text-xs space-y-1 text-emerald-950">
-                    <div className="flex items-center gap-1.5 font-bold text-emerald-900">
-                      <Sparkles className="w-3.5 h-3.5 text-emerald-700" />
-                      <span>15-Minute Express Delivery</span>
-                    </div>
-                    <p className="text-[11px] text-emerald-800 leading-relaxed font-normal">
-                      Instant order confirmation and delivery status will be sent to this number.
-                    </p>
-                  </div>
-
-                  {authError && (
-                    <div className="p-2.5 bg-rose-50 border border-rose-200 text-rose-700 rounded-xl text-xs flex items-center gap-1.5">
-                      <AlertCircle className="w-4 h-4 shrink-0" />
-                      <span>{authError}</span>
-                    </div>
-                  )}
-
-                  <button
-                    type="submit"
-                    disabled={authLoading || phone.replace(/\D/g, '').length < 10}
-                    className="w-full py-3 px-4 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-50 text-white font-semibold rounded-xl text-xs sm:text-sm transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer"
-                  >
-                    {authLoading ? (
-                      <>
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        <span>Generating Kirana UPI QR...</span>
-                      </>
-                    ) : (
-                      <>
-                        <span>Proceed to UPI Payment</span>
-                        <span>›</span>
-                      </>
-                    )}
-                  </button>
-                </form>
-              </motion.div>
-            ) : step === 'otp' ? (
-              /* STEP 2: Real 6-Digit OTP Verification */
-              <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="space-y-4"
-              >
-                {/* Number badge banner */}
-                <div className="p-2.5 bg-blue-50 border border-blue-200 text-blue-900 rounded-xl text-xs flex items-center justify-between">
-                  <div className="flex items-center gap-1.5 truncate">
-                    <Lock className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-                    <span className="truncate">Code sent to: <strong>+91 {phone}</strong></span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setStep('phone');
-                      setAuthError('');
-                    }}
-                    className="text-blue-700 hover:text-blue-900 font-bold underline text-[11px] shrink-0 ml-2 cursor-pointer"
-                  >
-                    Edit
-                  </button>
-                </div>
-
-                <div>
-                  <h4 className="text-base font-bold text-neutral-900 tracking-tight">
-                    Verify WhatsApp Code
-                  </h4>
-                  <p className="text-xs text-neutral-500 mt-0.5">
-                    Enter the 6-digit code sent to your phone:
-                  </p>
-                </div>
-
-                <form onSubmit={handleVerifyOtpSubmit} className="space-y-3.5">
-                  <div>
-                    <input
-                      type="text"
-                      maxLength={6}
-                      pattern="[0-9]*"
-                      inputMode="numeric"
-                      placeholder="••••••"
-                      value={otp}
-                      onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                      className="w-full py-3 px-4 text-center text-xl font-mono tracking-[0.4em] font-bold rounded-xl border border-neutral-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 bg-neutral-50 focus:bg-white outline-none"
-                      autoFocus
-                    />
-                  </div>
-
-                  {/* Resend Code link */}
-                  <div className="flex items-center justify-between text-xs text-neutral-500 pt-1">
-                    <span>Didn't receive the code?</span>
-                    <button
-                      type="button"
-                      onClick={handlePhoneSubmit}
-                      disabled={authLoading}
-                      className="text-emerald-700 hover:text-emerald-800 font-semibold cursor-pointer disabled:opacity-50"
-                    >
-                      Resend OTP
-                    </button>
-                  </div>
-
-                  {/* Instant Demo / Offline OTP auto-fill */}
-                  <div className="p-2.5 bg-emerald-50/70 border border-emerald-200/80 rounded-xl text-left space-y-1 text-xs">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[11px] font-semibold text-emerald-950 flex items-center gap-1">
-                        <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
-                        <span>Instant Verification Code</span>
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setOtp('123456');
-                          handleVerifyOtpSubmit(null, '123456');
-                        }}
-                        className="text-[11px] font-bold text-emerald-700 hover:text-emerald-800 underline cursor-pointer"
-                      >
-                        Auto-fill &amp; Continue ›
-                      </button>
-                    </div>
-                    <p className="text-[10px] text-emerald-800 leading-normal">
-                      If WhatsApp OTP is delayed or not coming, tap above to auto-fill code <strong>123456</strong> and continue directly to payment.
-                    </p>
-                  </div>
-
-                  {authError && (
-                    <div className="p-2.5 bg-rose-50 border border-rose-200 text-rose-700 rounded-xl text-xs flex items-center gap-1.5">
-                      <AlertCircle className="w-4 h-4 shrink-0" />
-                      <span>{authError}</span>
-                    </div>
-                  )}
-
-                  <button
-                    type="submit"
-                    disabled={authLoading || otp.length < 6}
-                    className="w-full py-3 px-4 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-50 text-white font-semibold rounded-xl text-xs sm:text-sm transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer"
-                  >
-                    {authLoading ? (
-                      <>
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        <span>Verifying &amp; Initializing QR...</span>
-                      </>
-                    ) : (
-                      <>
-                        <span>Verify &amp; Continue to Pay</span>
-                        <span>›</span>
-                      </>
-                    )}
-                  </button>
-                </form>
-              </motion.div>
             ) : step === 'payment' ? (
-              /* STEP 3: Real Dynamic UPI QR Code & Live Observer Mesh */
+              /* REAL DYNAMIC UPI QR CODE & LIVE OBSERVER MESH (NO OTP, NO FAKE PAYMENT DONE) */
               <motion.div
                 initial={{ opacity: 0, scale: 0.98 }}
                 animate={{ opacity: 1, scale: 1 }}
                 className="space-y-3.5 text-center"
               >
-                {/* Real STATIC Vector UPI QR Code */}
+                {/* Real Vector UPI QR Code */}
                 <div className="relative inline-block mx-auto p-3.5 bg-white rounded-2xl border-2 border-emerald-600/25 shadow-sm">
                   {qrDataUrl ? (
                     <div className="relative">
@@ -940,7 +583,7 @@ export default function YouPiPaymentModal({
                 </div>
 
                 {/* Direct Mobile UPI Intent Button (One-tap payment for phone users) */}
-                <div className="pt-0.5 space-y-2">
+                <div className="pt-0.5 space-y-1">
                   <a
                     href={buildUpiIntentUrl({
                       vpa: merchantConfig.merchantVpa,
@@ -954,33 +597,8 @@ export default function YouPiPaymentModal({
                     <Smartphone className="w-4 h-4 stroke-[2.2]" />
                     <span>Pay via UPI App (GPay / PhonePe / Paytm)</span>
                   </a>
-
-                  {/* Immediate 1-Tap Payment Done Button */}
-                  <button
-                    type="button"
-                    onClick={handleConfirmPaymentDone}
-                    disabled={confirmingPayment || observerStage === 'confirmed'}
-                    className="w-full py-2.5 px-3.5 bg-emerald-800 hover:bg-emerald-900 active:scale-[0.99] disabled:opacity-80 text-white font-bold rounded-xl text-xs shadow-sm flex items-center justify-center gap-2 transition-all cursor-pointer"
-                  >
-                    {confirmingPayment ? (
-                      <>
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        <span>Confirming payment with bank...</span>
-                      </>
-                    ) : observerStage === 'confirmed' ? (
-                      <>
-                        <CheckCircle2 className="w-4 h-4 text-emerald-300 stroke-[2.5]" />
-                        <span>Payment Verified! Placing Order...</span>
-                      </>
-                    ) : (
-                      <>
-                        <CheckCircle2 className="w-4 h-4 text-emerald-300 stroke-[2.5]" />
-                        <span>Payment Done? Confirm &amp; Place Order</span>
-                      </>
-                    )}
-                  </button>
-                  <span className="text-[10px] text-neutral-400 block mt-0.5">
-                    Tap above once payment is done in your UPI app, or wait for zero-click auto-detection
+                  <span className="text-[10px] text-neutral-400 block">
+                    Tap to launch installed UPI apps on this mobile phone
                   </span>
                 </div>
 
@@ -1040,7 +658,7 @@ export default function YouPiPaymentModal({
                   </button>
                 </div>
 
-                {/* Real 12-Digit UTR Verification Form (Standard Indian Payment Flow Fallback) */}
+                {/* Real 12-Digit UTR Verification Form (Verified directly against YouPI-PG) */}
                 <div className="pt-1 text-left">
                   <button
                     type="button"

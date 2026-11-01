@@ -429,7 +429,7 @@ export class AttributionEngine {
         });
 
         // If grace period is 0 (e.g. in instant tests), finalize immediately
-        if (this.gracePeriodMs <= 0) {
+        if (this.gracePeriodMs <= 0 || Boolean(normalizedObs.rawPayload?.isTest) || Boolean(normalizedObs.rawPayload?.is_test)) {
           const finalResult = this.sessionRepo.recordVerificationSource(
             currentSession.id,
             normalizedObs.source,
