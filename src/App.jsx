@@ -90,8 +90,13 @@ export default function App() {
         const saved = localStorage.getItem('kirana_current_user');
         if (saved) {
           const parsed = JSON.parse(saved);
-          const fakeNames = ['Ananya Iyer', 'Rahul Verma', 'Guest Explorer (Pune)'];
-          if (fakeNames.includes(parsed?.name)) {
+          const fakeNames = ['Ananya Iyer', 'Rahul Verma', 'Guest Explorer (Pune)', 'Guest User', 'Valued Shopper', 'Shopper (+91 3210)'];
+          if (
+            fakeNames.includes(parsed?.name) ||
+            (parsed?.name || '').includes('Guest Shopper') ||
+            (parsed?.email || '').includes('@kirana.store') && parsed?.name?.includes('Guest') ||
+            parsed?.isGuest
+          ) {
             localStorage.removeItem('kirana_current_user');
             return null;
           }

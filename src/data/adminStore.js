@@ -295,13 +295,15 @@ function sanitizeSessions(sessions) {
 
 function sanitizeCustomers(customers) {
   if (!Array.isArray(customers)) return [];
-  const fakeNames = ['Ananya Iyer', 'Rahul Verma', 'Guest Explorer (Pune)'];
-  const fakeEmails = ['ananya.iyer@gmail.com', 'rahul.verma@outlook.com', 'guest-994@kirana.store'];
+  const fakeNames = ['Ananya Iyer', 'Rahul Verma', 'Guest Explorer (Pune)', 'Guest User', 'Valued Shopper', 'Shopper (+91 3210)', 'Tarun'];
+  const fakeEmails = ['ananya.iyer@gmail.com', 'rahul.verma@outlook.com', 'guest-994@kirana.store', 'guest@kirana.store', 'tarun@kirana.store', '919876543210@mobile.kirana'];
 
   return customers.filter((c) => {
     if (!c || !c.id) return false;
     if (fakeNames.includes(c.name)) return false;
     if (fakeEmails.includes(c.email)) return false;
+    if ((c.name || '').includes('Guest Shopper')) return false;
+    if (c.phone === '+91 98765 43210' || c.phone === '+91 9876543210') return false;
     return true;
   });
 }
@@ -369,14 +371,16 @@ export function recordUserLogin(userData) {
   const updated = [newSession, ...filtered];
   saveActiveSessions(updated);
 
-  // Sync to customers table
-  recordCustomer({
-    name: userName,
-    email: userData.email || '',
-    phone: userData.phone || '',
-    type: userData.isGuest ? 'Guest Shopper' : 'Verified Customer',
-    registeredDate: new Date().toISOString().split('T')[0]
-  });
+  // Only sync verified registered accounts to customers table (guests are session-only)
+  if (!userData.isGuest && (userData.email || (userData.phone && userData.phone !== 'N/A'))) {
+    recordCustomer({
+      name: userName,
+      email: userData.email || '',
+      phone: userData.phone || '',
+      type: 'Verified Customer',
+      registeredDate: new Date().toISOString().split('T')[0]
+    });
+  }
 
   // Query real public IP & location in background and update session
   getClientNetworkInfo().then((netInfo) => {
@@ -554,7 +558,17 @@ export function deleteCustomer(customerId) {
 // 6. ORDERS DATA & CHECKOUT PROCESSING
 export function getOrders() {
   const raw = getStoredItem(STORAGE_KEYS.ORDERS, []);
-  return Array.isArray(raw) ? raw : [];
+  if (!Array.isArray(raw)) return [];
+  const fakeNames = ['Guest User', 'Valued Shopper', 'Shopper (+91 3210)', 'Tarun'];
+  const fakeEmails = ['guest@kirana.store', 'tarun@kirana.store', '919876543210@mobile.kirana'];
+  return raw.filter((o) => {
+    if (!o || !o.id) return false;
+    if (fakeNames.includes(o.customer_name)) return false;
+    if (fakeEmails.includes(o.customer_email)) return false;
+    if ((o.customer_name || '').includes('Guest Shopper')) return false;
+    if (o.items && Array.isArray(o.items) && o.items.some(it => it.name === 'Sugar' && String(it.image).startsWith('data:image'))) return false;
+    return true;
+  });
 }
 
 export function saveOrders(orders) {
