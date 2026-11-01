@@ -48,6 +48,19 @@ export default function ProductDetailPage({
   const [showRatingModal, setShowRatingModal] = useState(false);
   const [openFaq, setOpenFaq] = useState(null);
 
+  const reviewCount = useMemo(() => {
+    if (typeof window !== 'undefined' && product?.id) {
+      try {
+        const stored = localStorage.getItem(`kirana_reviews_${product.id}`);
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed)) return parsed.length;
+        }
+      } catch (_) {}
+    }
+    return 0;
+  }, [product?.id]);
+
   useEffect(() => {
     if (product?.image) {
       setSelectedImage(product.image);
@@ -188,7 +201,9 @@ export default function ProductDetailPage({
             >
               <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500 group-hover:rotate-12 transition-transform" />
               <span>{product.rating || '4.8'}</span>
-              <span className="text-[#86868b] font-normal text-[10px]">(248)</span>
+              {reviewCount > 0 && (
+                <span className="text-[#86868b] font-normal text-[10px]">({reviewCount})</span>
+              )}
             </button>
 
             {/* Product Image */}
@@ -266,12 +281,12 @@ export default function ProductDetailPage({
                 </div>
                 <span className="text-neutral-300">•</span>
                 <span className="text-emerald-800 font-bold underline decoration-dotted group-hover:text-emerald-950">
-                  248 Ratings &amp; 86 Reviews
+                  {reviewCount > 0 ? `${reviewCount} ${reviewCount === 1 ? 'Rating & Review' : 'Ratings & Reviews'}` : 'Verified Direct Sourcing'}
                 </span>
               </button>
               <span className="text-neutral-300">•</span>
               <span className="text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 text-[10px]">
-                96% Recommend
+                100% Authentic Quality
               </span>
             </div>
 

@@ -193,11 +193,10 @@ export async function sendCustomerOtp({ mobileNumber, name, email, isNewUser }) 
     });
     return await res.json();
   } catch (err) {
-    console.warn('[YouPI] sendCustomerOtp fallback:', err);
-    // Standalone fallback: return mock OTP
+    console.warn('[YouPI] sendCustomerOtp error:', err);
     return {
-      success: true,
-      message: 'OTP sent to WhatsApp number.',
+      success: false,
+      error: 'Unable to connect to WhatsApp OTP service. Please ensure the daemon is running or use Email OTP.',
       mobileNumber: cleanMobile
     };
   }
@@ -223,15 +222,10 @@ export async function verifyCustomerOtp({ mobileNumber, otp, name, email }) {
     });
     return await res.json();
   } catch (err) {
-    console.warn('[YouPI] verifyCustomerOtp fallback:', err);
+    console.warn('[YouPI] verifyCustomerOtp error:', err);
     return {
-      success: true,
-      token: `mock_tok_${Date.now()}`,
-      customer: {
-        id: `mock_cust_${cleanMobile}`,
-        name: name || 'Customer',
-        mobileNumber: cleanMobile
-      }
+      success: false,
+      error: 'OTP verification server unreachable. Please check network connection.'
     };
   }
 }
@@ -267,13 +261,13 @@ export async function createYouPiPayment({ orderId, amount, currency = 'INR', cu
       status: data.status
     };
   } catch (err) {
-    console.warn('[YouPI] createYouPiPayment fallback:', err);
+    console.warn('[YouPI] createYouPiPayment error:', err);
     return {
-      success: true,
-      paymentId: `fallback_${Date.now()}`,
+      success: false,
+      error: 'Unable to connect to YouPI payment gateway server.',
       amount: Number(amount).toFixed(2),
       orderId,
-      status: 'INITIATED'
+      status: 'FAILED'
     };
   }
 }
@@ -294,8 +288,8 @@ export async function bindCustomerToSession({ paymentId, token, customerId }) {
     });
     return await res.json();
   } catch (err) {
-    console.warn('[YouPI] bindCustomerToSession fallback:', err);
-    return { success: true, status: 'ACTIVE' };
+    console.warn('[YouPI] bindCustomerToSession error:', err);
+    return { success: false, error: 'Could not bind customer session' };
   }
 }
 

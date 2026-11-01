@@ -19,70 +19,18 @@ export default function ProductReviewsSection({ product, isModalOpen, onCloseMod
   const productId = product?.id || 'default';
   const storageKey = `kirana_reviews_${productId}`;
 
-  // Default seed reviews tailored to this grocery item
-  const seedReviews = useMemo(() => [
-    {
-      id: 'rev-1',
-      name: 'Priya Sundaram',
-      location: 'Hyderabad',
-      verified: true,
-      rating: 5,
-      date: '2 days ago',
-      title: 'Remarkable freshness and super fast delivery!',
-      comment: `Received ${product.name} in 12 minutes flat. The quality and aroma exceeded my expectations. Sealed properly with zero moisture leakage. Definitely ordering again!`,
-      helpful: 19,
-      isHelpful: false
-    },
-    {
-      id: 'rev-2',
-      name: 'Rahul Varma',
-      location: 'Bangalore',
-      verified: true,
-      rating: 5,
-      date: '5 days ago',
-      title: 'Top tier grocery quality at honest pricing',
-      comment: `Compared this to standard supermarket packs and this is noticeably fresher and better priced. Kirana has done a fantastic job with farm-direct sourcing.`,
-      helpful: 14,
-      isHelpful: false
-    },
-    {
-      id: 'rev-3',
-      name: 'Anita K.',
-      location: 'Vijayawada',
-      verified: true,
-      rating: 4,
-      date: '1 week ago',
-      title: 'Good everyday pantry staple',
-      comment: `Very good product. Delivered clean and well packed. Giving 4 stars only because the delivery agent took 16 minutes instead of 15, but product quality is 5/5.`,
-      helpful: 8,
-      isHelpful: false
-    },
-    {
-      id: 'rev-4',
-      name: 'Kiran Kumar',
-      location: 'Guntur',
-      verified: true,
-      rating: 5,
-      date: '2 weeks ago',
-      title: 'Authentic taste & great shelf life',
-      comment: `Genuine natural quality. You can tell there are no artificial coatings or stale preservatives. Very happy with the purchase.`,
-      helpful: 6,
-      isHelpful: false
-    }
-  ], [product.name]);
-
-  // Load reviews from localStorage + seeds
+  // Load reviews strictly from real customer submissions (localStorage)
   const [reviews, setReviews] = useState(() => {
     if (typeof window !== 'undefined') {
       try {
         const stored = localStorage.getItem(storageKey);
         if (stored) {
           const parsed = JSON.parse(stored);
-          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          if (Array.isArray(parsed)) return parsed;
         }
       } catch (e) {}
     }
-    return seedReviews;
+    return [];
   });
 
   // Active filter tab: 'all' | 5 | 4 | 3 | 2 | 1 | 'verified'
@@ -107,19 +55,37 @@ export default function ProductReviewsSection({ product, isModalOpen, onCloseMod
     }
   }, [reviews, storageKey]);
 
-  // Rating Distribution & Math
-  const totalReviewCount = 248 + reviews.length - seedReviews.length;
+  // Rating Distribution & Math calculated dynamically from real customer reviews
+  const totalReviewCount = reviews.length;
   
-  // Realistic breakdown for 248 total ratings
   const distribution = useMemo(() => {
-    return [
-      { stars: 5, count: 193, percent: 78 },
-      { stars: 4, count: 35, percent: 14 },
-      { stars: 3, count: 12, percent: 5 },
-      { stars: 2, count: 5, percent: 2 },
-      { stars: 1, count: 3, percent: 1 }
-    ];
-  }, []);
+    if (totalReviewCount === 0) {
+      return [
+        { stars: 5, count: 0, percent: 0 },
+        { stars: 4, count: 0, percent: 0 },
+        { stars: 3, count: 0, percent: 0 },
+        { stars: 2, count: 0, percent: 0 },
+        { stars: 1, count: 0, percent: 0 }
+      ];
+    }
+    return [5, 4, 3, 2, 1].map((stars) => {
+      const count = reviews.filter((r) => Number(r.rating) === stars).length;
+      const percent = Math.round((count / totalReviewCount) * 100);
+      return { stars, count, percent };
+    });
+  }, [reviews, totalReviewCount]);
+
+  const averageRating = useMemo(() => {
+    if (totalReviewCount === 0) return product.rating || '4.8';
+    const sum = reviews.reduce((acc, r) => acc + (Number(r.rating) || 5), 0);
+    return (sum / totalReviewCount).toFixed(1);
+  }, [reviews, totalReviewCount, product.rating]);
+
+  const recommendPercent = useMemo(() => {
+    if (totalReviewCount === 0) return null;
+    const positive = reviews.filter(r => Number(r.rating) >= 4).length;
+    return Math.round((positive / totalReviewCount) * 100);
+  }, [reviews, totalReviewCount]);
 
   const handleHelpfulClick = (reviewId) => {
     setReviews(prev => prev.map(rev => {
@@ -236,7 +202,7 @@ export default function ProductReviewsSection({ product, isModalOpen, onCloseMod
             </span>
             <div className="flex items-baseline gap-2 mb-2">
               <span className="text-4xl sm:text-5xl font-black text-[#1d1d1f] tracking-tight">
-                {product.rating || '4.8'}
+                {averageRating}
               </span>
               <span className="text-base text-[#86868b] font-medium">/ 5.0</span>
             </div>
@@ -248,14 +214,18 @@ export default function ProductReviewsSection({ product, isModalOpen, onCloseMod
             </div>
 
             <p className="text-xs text-[#86868b]">
-              Based on <strong className="text-neutral-900">{totalReviewCount}</strong> ratings &amp; <strong className="text-neutral-900">{reviews.length}</strong> written customer reviews
+              {totalReviewCount > 0 ? (
+                <>Based on <strong className="text-neutral-900">{totalReviewCount}</strong> verified customer {totalReviewCount === 1 ? 'review' : 'reviews'}</>
+              ) : (
+                <>No reviews submitted yet for this product</>
+              )}
             </p>
             
             <div className="mt-4 pt-3 border-t border-black/[0.06] w-full flex items-center justify-between text-xs">
               <span className="text-emerald-700 font-bold flex items-center gap-1">
-                <CheckCircle2 className="w-3.5 h-3.5" /> 96% Recommend
+                <CheckCircle2 className="w-3.5 h-3.5" /> {recommendPercent !== null ? `${recommendPercent}% Recommend` : 'Farm Sourced'}
               </span>
-              <span className="text-neutral-500 text-[11px]">100% Verified</span>
+              <span className="text-neutral-500 text-[11px]">100% Authentic</span>
             </div>
           </div>
 
@@ -372,7 +342,21 @@ export default function ProductReviewsSection({ product, isModalOpen, onCloseMod
 
         {/* Reviews List */}
         <div className="space-y-4">
-          {filteredReviews.length === 0 ? (
+          {reviews.length === 0 ? (
+            <div className="py-12 px-4 text-center text-[#86868b] bg-[#f9fafb] rounded-2xl border border-dashed border-neutral-300">
+              <MessageSquare className="w-8 h-8 text-neutral-400 mx-auto mb-2 stroke-[1.5]" />
+              <p className="text-sm font-semibold text-neutral-700">No reviews yet for this product</p>
+              <p className="text-xs text-neutral-500 mt-1 max-w-sm mx-auto">Be the first verified customer to share your experience with {product.name}!</p>
+              <button
+                type="button"
+                onClick={() => setIsWriteModalOpen(true)}
+                className="mt-4 px-4 py-2 rounded-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-xs cursor-pointer inline-flex items-center gap-1.5 transition-all"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Write the First Review</span>
+              </button>
+            </div>
+          ) : filteredReviews.length === 0 ? (
             <div className="py-12 text-center text-[#86868b] bg-[#f9fafb] rounded-2xl border border-dashed border-neutral-300">
               <MessageSquare className="w-8 h-8 text-neutral-400 mx-auto mb-2 stroke-[1.5]" />
               <p className="text-sm font-semibold text-neutral-700">No reviews found matching this filter</p>

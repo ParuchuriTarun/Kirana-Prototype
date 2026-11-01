@@ -36,7 +36,6 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialSte
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [timer, setTimer] = useState(30);
   const [canResend, setCanResend] = useState(false);
-  const [generatedPhoneOtp, setGeneratedPhoneOtp] = useState('1234');
   const [matchedAccount, setMatchedAccount] = useState(null);
   const [phoneSentNotice, setPhoneSentNotice] = useState('');
 
@@ -771,12 +770,12 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialSte
           userId: customerRecord.id,
           name: customerRecord.name || cleanName,
           email: cleanEmail,
-          phone: customerRecord.phone && customerRecord.phone !== 'N/A' ? customerRecord.phone : '+91 98765 43210',
-          location: customerRecord.location || 'Kothapet, India',
+          phone: customerRecord.phone && customerRecord.phone !== 'N/A' ? customerRecord.phone : 'Not linked',
+          location: customerRecord.location || 'Online Store',
           type: 'Google Verified Customer',
           isGoogle: true,
           method: 'google',
-          avatar: customerRecord.avatar || account.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80',
+          avatar: customerRecord.avatar || account.avatar || '',
           registeredDate: customerRecord.registeredDate || new Date().toISOString().split('T')[0],
           totalOrders: customerRecord.totalOrders || 0,
           totalSpent: customerRecord.totalSpent || 0
@@ -802,10 +801,10 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialSte
         id: newId,
         name: cleanName,
         email: cleanEmail,
-        phone: '+91 98765 43210',
-        location: 'Online Store • Express Node',
+        phone: 'Not linked',
+        location: 'Online Store',
         type: 'Google Verified Customer',
-        avatar: account.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80',
+        avatar: account.avatar || '',
         totalOrders: 0,
         totalSpent: 0,
         registeredDate: new Date().toISOString().split('T')[0],
@@ -954,15 +953,6 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialSte
         setOtp(newOtp);
       }
     }
-  };
-
-  const handleFillDemoOtp = () => {
-    const code = generatedPhoneOtp || '1234';
-    setOtp(code.split(''));
-    setError('');
-    setTimeout(() => {
-      verifyPhoneOtpCode(code);
-    }, 150);
   };
 
   const stepTransition = { duration: 0.28, ease: [0.22, 1, 0.36, 1] };
@@ -1461,145 +1451,76 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialSte
                     <ArrowRight className="w-4 h-4 text-white/80 shrink-0" />
                   </motion.button>
 
-                  {/* Account List */}
-                  <div className="space-y-2.5">
-                    {/* Primary Verified Account: Tarun Paruchuri */}
-                    <motion.button
-                      type="button"
-                      disabled={isLoading}
-                      whileHover={{ scale: 1.01, backgroundColor: '#f9f9fb' }}
-                      whileTap={{ scale: 0.99 }}
-                      onClick={() => handleSelectGoogleAccount({
-                        name: 'Tarun Paruchuri',
-                        email: 'tarunparuchuri226@gmail.com',
-                        avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80'
-                      })}
-                      className="w-full text-left p-3.5 rounded-2xl border-2 border-emerald-600/35 hover:border-emerald-600 bg-white shadow-2xs hover:shadow-sm transition-all duration-200 cursor-pointer flex items-center justify-between gap-3 group relative overflow-hidden"
-                    >
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div className="relative shrink-0">
-                          <div className="w-11 h-11 rounded-full bg-gradient-to-tr from-[#1a73e8] to-[#4285F4] text-white font-bold text-base flex items-center justify-center shadow-xs">
-                            T
-                          </div>
-                          <div className="absolute -bottom-1 -right-1 w-4.5 h-4.5 rounded-full bg-white border border-black/[0.08] flex items-center justify-center shadow-2xs">
-                            <svg className="w-3 h-3" viewBox="0 0 24 24">
-                              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
-                              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
-                            </svg>
-                          </div>
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-1.5 flex-wrap">
-                            <span className="font-bold text-sm text-[#1d1d1f] truncate">Tarun Paruchuri</span>
-                            <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.2 rounded-full">Registered</span>
-                          </div>
-                          <p className="text-xs text-[#86868b] truncate">tarunparuchuri226@gmail.com</p>
-                          <p className="text-[11px] text-emerald-700 font-medium mt-0.5">
-                            14 Past Orders • 1-Click Instant Sign-In
-                          </p>
-                        </div>
+                  {/* Direct Native Google OAuth Button */}
+                  <motion.button
+                    type="button"
+                    disabled={isLoading}
+                    whileHover={{ scale: 1.01 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={handleNativeGoogleOAuth}
+                    className="w-full p-3 rounded-2xl border border-black/[0.12] hover:border-black/[0.25] bg-white text-[#1d1d1f] shadow-2xs flex items-center justify-between gap-3 cursor-pointer mb-3 transition-all"
+                  >
+                    <div className="flex items-center gap-3 text-left">
+                      <div className="w-9 h-9 rounded-full bg-neutral-100 flex items-center justify-center shrink-0">
+                        <svg className="w-4.5 h-4.5" viewBox="0 0 24 24">
+                          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
+                          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
+                        </svg>
                       </div>
-                      <div className="shrink-0">
-                        <span className="px-3 py-1.5 rounded-full bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold shadow-2xs group-hover:scale-105 transition-transform flex items-center gap-1">
-                          <span>Continue</span>
-                          <ArrowRight className="w-3.5 h-3.5" />
-                        </span>
+                      <div>
+                        <span className="font-bold text-xs sm:text-sm text-[#1d1d1f] block">Sign In via Supabase Google OAuth</span>
+                        <p className="text-[11px] text-[#86868b]">Redirects to official Google consent screen</p>
                       </div>
-                    </motion.button>
+                    </div>
+                    <ArrowRight className="w-4 h-4 text-[#86868b] shrink-0" />
+                  </motion.button>
 
-                    {/* Alternative Account: Demo Shopper */}
-                    <motion.button
-                      type="button"
-                      disabled={isLoading}
-                      whileHover={{ scale: 1.01, backgroundColor: '#f9f9fb' }}
-                      whileTap={{ scale: 0.99 }}
-                      onClick={() => handleSelectGoogleAccount({
-                        name: 'Kirana Shopper',
-                        email: 'shopper.google@gmail.com'
-                      })}
-                      className="w-full text-left p-3 rounded-2xl border border-black/[0.08] hover:border-black/[0.15] bg-white shadow-2xs transition-all duration-200 cursor-pointer flex items-center justify-between gap-3 group"
+                  {/* Or Enter Google Email Address */}
+                  <div className="pt-2">
+                    <form
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        if (!customGoogleEmail || !customGoogleEmail.includes('@')) {
+                          setError('Please enter a valid Google email address');
+                          return;
+                        }
+                        handleSelectGoogleAccount({
+                          name: customGoogleEmail.split('@')[0],
+                          email: customGoogleEmail
+                        });
+                      }}
+                      className="p-3.5 rounded-2xl border border-black/[0.1] bg-[#f9f9fb] space-y-2.5"
                     >
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-teal-500 to-emerald-500 text-white font-bold text-sm flex items-center justify-center shrink-0">
-                          K
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <span className="font-semibold text-xs text-[#1d1d1f] block truncate">Kirana Shopper</span>
-                          <span className="text-[11px] text-[#86868b] block truncate">shopper.google@gmail.com</span>
-                        </div>
+                      <div className="flex items-center justify-between">
+                        <label className="text-xs font-bold text-[#1d1d1f]">Or Enter Your Google Email</label>
                       </div>
-                      <ArrowRight className="w-4 h-4 text-[#86868b] group-hover:text-emerald-700 group-hover:translate-x-0.5 transition-all shrink-0" />
-                    </motion.button>
-
-                    {/* Use Another Google Account Toggle */}
-                    {!showCustomGoogleInput ? (
+                      <div className="relative rounded-xl border border-black/[0.1] focus-within:border-emerald-600 bg-white overflow-hidden">
+                        <input
+                          type="email"
+                          required
+                          value={customGoogleEmail}
+                          onChange={(e) => setCustomGoogleEmail(e.target.value)}
+                          placeholder="yourname@gmail.com"
+                          className="w-full px-3 py-2.5 text-xs text-[#1d1d1f] focus:outline-none"
+                        />
+                      </div>
                       <button
-                        type="button"
-                        onClick={() => setShowCustomGoogleInput(true)}
-                        className="w-full text-left p-3 rounded-2xl border border-dashed border-black/[0.15] hover:border-black/[0.3] hover:bg-[#f5f5f7] bg-transparent text-xs font-semibold text-[#1d1d1f] transition-all duration-200 cursor-pointer flex items-center gap-3"
+                        type="submit"
+                        disabled={isLoading}
+                        className="w-full py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs transition-colors"
                       >
-                        <div className="w-10 h-10 rounded-full border border-black/[0.1] bg-white flex items-center justify-center text-[#86868b] shrink-0">
-                          <UserPlus className="w-4 h-4" />
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <span className="block font-medium text-[#1d1d1f]">Use another Google account</span>
-                          <span className="text-[11px] text-[#86868b]">Sign in with any other @gmail.com address</span>
-                        </div>
+                        {isLoading ? (
+                          <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        ) : (
+                          <>
+                            <span>Continue with Google Email</span>
+                            <ArrowRight className="w-3.5 h-3.5" />
+                          </>
+                        )}
                       </button>
-                    ) : (
-                      <form
-                        onSubmit={(e) => {
-                          e.preventDefault();
-                          if (!customGoogleEmail || !customGoogleEmail.includes('@')) {
-                            setError('Please enter a valid Google email address');
-                            return;
-                          }
-                          handleSelectGoogleAccount({
-                            name: customGoogleEmail.split('@')[0],
-                            email: customGoogleEmail
-                          });
-                        }}
-                        className="p-3.5 rounded-2xl border border-black/[0.12] bg-[#f9f9fb] space-y-2.5"
-                      >
-                        <div className="flex items-center justify-between">
-                          <label className="text-xs font-semibold text-[#1d1d1f]">Enter your Google Email</label>
-                          <button
-                            type="button"
-                            onClick={() => setShowCustomGoogleInput(false)}
-                            className="text-[11px] text-[#86868b] hover:text-[#1d1d1f] cursor-pointer"
-                          >
-                            Cancel
-                          </button>
-                        </div>
-                        <div className="relative rounded-xl border border-black/[0.1] focus-within:border-emerald-600 bg-white overflow-hidden">
-                          <input
-                            type="email"
-                            required
-                            value={customGoogleEmail}
-                            onChange={(e) => setCustomGoogleEmail(e.target.value)}
-                            placeholder="username@gmail.com"
-                            className="w-full px-3 py-2.5 text-xs text-[#1d1d1f] focus:outline-none"
-                            autoFocus
-                          />
-                        </div>
-                        <button
-                          type="submit"
-                          disabled={isLoading}
-                          className="w-full py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs"
-                        >
-                          {isLoading ? (
-                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                          ) : (
-                            <>
-                              <span>Sign in with this Google account</span>
-                              <ArrowRight className="w-3.5 h-3.5" />
-                            </>
-                          )}
-                        </button>
-                      </form>
-                    )}
+                    </form>
                   </div>
 
                   {/* Footer Security & Firebase Sign-In Note */}

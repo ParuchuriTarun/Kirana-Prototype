@@ -45,32 +45,7 @@ import { getOrders, getCustomers, saveCustomers, recordCustomer } from '../data/
 import { getClientDeviceInfo, getClientNetworkInfo } from '../utils/deviceInfo';
 import { supabase } from '../utils/supabase';
 
-const DEFAULT_SAVED_ADDRESSES = [
-  {
-    id: 'addr-default-1',
-    label: 'Home',
-    type: 'home',
-    isPrimary: true,
-    recipient: 'Valued Shopper',
-    flat: 'Flat 402, Sri Rama Meadows',
-    area: 'Green Hills Colony, Kothapet',
-    city: 'Hyderabad, Telangana',
-    pincode: '500035',
-    phone: '+91 98765 43210'
-  },
-  {
-    id: 'addr-default-2',
-    label: 'Work / Office',
-    type: 'work',
-    isPrimary: false,
-    recipient: 'Valued Shopper',
-    flat: 'Building 12B, Mindspace IT Park',
-    area: 'HITEC City, Madhapur',
-    city: 'Hyderabad, Telangana',
-    pincode: '500081',
-    phone: '+91 98765 43210'
-  }
-];
+const DEFAULT_SAVED_ADDRESSES = [];
 
 const DEFAULT_PREFERENCES = {
   whatsappUpdates: true,
@@ -294,7 +269,7 @@ export default function ProfilePage({
   const displayEmail = customerProfile?.email || user?.email || (user?.isGuest ? 'guest-shopper@kirana.store' : 'Not linked');
   const displayPhone = customerProfile?.phone && customerProfile.phone !== 'N/A' 
     ? customerProfile.phone 
-    : (user?.phone || '+91 98765 43210');
+    : (user?.phone || 'Not linked');
   const customerType = customerProfile?.type || (user?.isGuest ? 'Guest Explorer' : 'Verified Customer');
   
   let memberSince = 'October 2026';
@@ -314,9 +289,9 @@ export default function ProfilePage({
 
   const deliveryLocation = primaryAddress 
     ? `${primaryAddress.area}, ${primaryAddress.city.split(',')[0]}`
-    : (customerProfile?.location || networkLocation || 'Kothapet, Hyderabad');
+    : (customerProfile?.location || 'Set delivery location');
 
-  const customerId = customerProfile?.id || (user?.userId ? 'CUST-' + String(user.userId).slice(-8).toUpperCase() : 'CUST-DB41960');
+  const customerId = customerProfile?.id || (user?.userId ? 'CUST-' + String(user.userId).slice(-8).toUpperCase() : (user?.id ? 'CUST-' + String(user.id).slice(-8).toUpperCase() : 'CUST-NEW'));
 
   const [copiedId, setCopiedId] = useState(false);
   const latestOrder = userOrders && userOrders.length > 0 ? userOrders[0] : null;
@@ -870,7 +845,25 @@ export default function ProfilePage({
 
           {/* Address Cards Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
-            {savedAddresses.map((addr) => {
+            {savedAddresses.length === 0 ? (
+              <div className="col-span-full py-10 px-4 text-center rounded-2xl border border-dashed border-neutral-300 bg-neutral-50/50 flex flex-col items-center justify-center gap-2">
+                <div className="w-10 h-10 rounded-xl bg-neutral-100 flex items-center justify-center text-neutral-400">
+                  <MapPin className="w-5 h-5 stroke-[1.5]" />
+                </div>
+                <div>
+                  <h3 className="text-xs sm:text-sm font-bold text-neutral-800">No saved addresses yet</h3>
+                  <p className="text-[11px] text-neutral-500 max-w-sm mt-0.5">Add your delivery location for 15-minute lightning grocery delivery.</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsAddAddressModalOpen(true)}
+                  className="mt-2 px-3.5 py-1.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-2xs transition-colors cursor-pointer"
+                >
+                  + Add Delivery Address
+                </button>
+              </div>
+            ) : (
+              savedAddresses.map((addr) => {
               const isWork = addr.type === 'work' || addr.label.toLowerCase().includes('work') || addr.label.toLowerCase().includes('office');
               return (
                 <div
@@ -933,7 +926,7 @@ export default function ProfilePage({
                   </div>
                 </div>
               );
-            })}
+            }))}
           </div>
         </div>
 
@@ -1320,7 +1313,7 @@ export default function ProfilePage({
                       value={editForm.phone}
                       onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
                       className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-medium text-neutral-900 bg-neutral-50/50"
-                      placeholder="+91 98765 43210"
+                      placeholder="+91 9XXXXXXXXX"
                     />
                   </div>
 
