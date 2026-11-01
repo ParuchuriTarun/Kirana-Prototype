@@ -707,7 +707,7 @@ export default function App() {
           />
         ) : (
           <>
-            <div className="mb-4 sm:mb-6">
+            <div className="mb-6 sm:mb-8 lg:mb-10">
               <HeroCarousel onShopClick={handleShopClick} />
             </div>
             <div className="relative z-10">

@@ -46,14 +46,14 @@ const getCardAnimation = (slideIndex, activeIndex, totalSlides, direction) => {
     isRight,
     x: `${offset * 22}%`,
     y: '0%',
-    scale: isCenter ? 1.08 : 0.88,
+    scale: isCenter ? 1.05 : 0.88,
     opacity: isCenter ? 1 : (isLeft || isRight ? 0.72 : 0),
     zIndex: isCenter ? 30 : (isLeft || isRight ? 15 : 0),
     pointerEvents: (isCenter || isLeft || isRight) ? 'auto' : 'none',
     visibility: 'visible',
     boxShadow: isCenter 
-      ? '0 0 0 1px rgba(0, 0, 0, 0.04), 0 4px 16px rgba(0, 0, 0, 0.04), 0 28px 64px -16px rgba(0, 0, 0, 0.16)' 
-      : '0 0 0 1px rgba(0, 0, 0, 0.03), 0 2px 8px rgba(0, 0, 0, 0.03), 0 10px 24px -8px rgba(0, 0, 0, 0.08)',
+      ? '0 0 0 1px rgba(0, 0, 0, 0.04), 0 8px 24px -4px rgba(0, 0, 0, 0.1), 0 24px 48px -12px rgba(0, 0, 0, 0.15)' 
+      : '0 0 0 1px rgba(0, 0, 0, 0.03), 0 4px 12px -2px rgba(0, 0, 0, 0.06)',
     filter: isCenter ? 'brightness(1)' : 'brightness(0.94)',
   };
 };
@@ -130,14 +130,14 @@ export default function HeroCarousel({ slides: propSlides, onShopClick }) {
 
   return (
     <section 
-      className="w-full px-2 sm:px-4 md:px-6 pt-1 sm:pt-2 pb-0 select-none overflow-x-clip"
+      className="w-full px-2 sm:px-4 md:px-6 pt-5 sm:pt-7 lg:pt-9 pb-1 select-none overflow-x-clip"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
-      <div className="relative w-full h-[240px] sm:h-[320px] md:h-[370px] lg:h-[440px] xl:h-[490px] 2xl:h-[540px] flex items-center justify-center">
+      <div className="relative w-full h-[260px] sm:h-[340px] md:h-[400px] lg:h-[460px] xl:h-[510px] 2xl:h-[560px] flex items-center justify-center">
         
         {displaySlides.map((slide, index) => {
           const anim = getCardAnimation(index, currentIndex, totalSlides, direction);
@@ -160,7 +160,7 @@ export default function HeroCarousel({ slides: propSlides, onShopClick }) {
                 if (anim.isRight) goToNext();
                 else if (anim.isLeft) goToPrev();
               }}
-              className={`absolute inset-0 m-auto aspect-[16/10] sm:aspect-[16/9] w-[90%] sm:w-[80%] md:w-[76%] lg:w-[72%] xl:w-[70%] max-w-[1320px] rounded-[22px] sm:rounded-[32px] lg:rounded-[36px] overflow-hidden bg-white ${
+              className={`absolute inset-0 m-auto aspect-[16/10] sm:aspect-[16/9] w-[90%] sm:w-[80%] md:w-[76%] lg:w-[72%] xl:w-[70%] max-w-[1280px] rounded-[22px] sm:rounded-[32px] lg:rounded-[36px] overflow-hidden bg-white ${
                 anim.isCenter 
                   ? 'cursor-default border border-black/[0.04]' 
                   : 'cursor-pointer transition-opacity duration-300 border border-black/[0.04]'
@@ -234,7 +234,7 @@ export default function HeroCarousel({ slides: propSlides, onShopClick }) {
         {/* Apple Pagination Dots */}
         {totalSlides > 1 && (
           <div 
-            className="absolute bottom-0.5 sm:bottom-1 left-1/2 -translate-x-1/2 flex items-center gap-2 z-40"
+            className="absolute bottom-2 sm:bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-2 z-40"
             aria-label="Carousel pagination"
           >
             {displaySlides.map((_, idx) => (
@@ -245,17 +245,17 @@ export default function HeroCarousel({ slides: propSlides, onShopClick }) {
                   setDirection(idx > currentIndex ? 1 : -1);
                   setCurrentIndex(idx);
                 }}
-                className="relative p-1 focus:outline-none cursor-pointer"
+                className="relative p-1.5 focus:outline-none cursor-pointer"
                 aria-label={`Go to slide ${idx + 1}`}
               >
                 {idx === currentIndex ? (
                   <motion.div
                     layoutId="activeSlideIndicator"
-                    className="w-7 sm:w-8 h-[4px] bg-emerald-500 rounded-full shadow-xs"
+                    className="w-7 sm:w-8 h-[4px] bg-emerald-600 rounded-full shadow-xs"
                     transition={{ type: "spring", stiffness: 400, damping: 30 }}
                   />
                 ) : (
-                  <div className="w-[4px] h-[4px] bg-white/40 hover:bg-white/70 rounded-full transition-colors duration-200" />
+                  <div className="w-[5px] h-[5px] bg-neutral-400/60 hover:bg-neutral-600 rounded-full transition-colors duration-200" />
                 )}
               </button>
             ))}
