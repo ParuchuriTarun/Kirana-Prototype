@@ -59,19 +59,19 @@ export default function ProductPriceHistory({ product }) {
   };
 
   return (
-    <section className="mt-10 p-5 sm:p-8 bg-white rounded-[28px] border border-black/[0.06] shadow-[0_4px_30px_rgba(0,0,0,0.03)] font-sans">
+    <section className="mt-8 sm:mt-10 p-4 sm:p-8 bg-white rounded-2xl sm:rounded-[28px] border border-black/[0.06] shadow-[0_4px_30px_rgba(0,0,0,0.03)] font-sans">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-black/[0.06]">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 pb-4 sm:pb-6 border-b border-black/[0.06]">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="p-1.5 rounded-lg bg-emerald-50 text-emerald-800">
               <TrendingDown className="w-4 h-4" />
             </span>
-            <h3 className="text-lg sm:text-xl font-extrabold text-[#1d1d1f] tracking-tight">
+            <h3 className="text-base sm:text-xl font-extrabold text-[#1d1d1f] tracking-tight">
               Price History &amp; Trend Tracker
             </h3>
           </div>
-          <p className="text-xs text-[#86868b]">
+          <p className="text-[11px] sm:text-xs text-[#86868b]">
             Track verified historical price changes across Kirana dark stores
           </p>
         </div>
@@ -79,7 +79,7 @@ export default function ProductPriceHistory({ product }) {
         <button
           type="button"
           onClick={handleToggleAlert}
-          className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold transition-all cursor-pointer shadow-2xs ${
+          className={`inline-flex items-center justify-center gap-2 px-3.5 sm:px-4 py-2 rounded-full text-xs font-bold transition-all cursor-pointer shadow-2xs w-full sm:w-auto ${
             alertEnabled
               ? 'bg-emerald-700 text-white shadow-emerald-700/20'
               : 'bg-neutral-100 hover:bg-neutral-200 text-neutral-800'
@@ -91,73 +91,73 @@ export default function ProductPriceHistory({ product }) {
       </div>
 
       {/* KPI Cards Row */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 my-6">
-        <div className="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-100">
-          <span className="text-[11px] font-bold text-emerald-800 uppercase tracking-wider block mb-1">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-4 my-4 sm:my-6">
+        <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-emerald-50/70 border border-emerald-100">
+          <span className="text-[10px] sm:text-[11px] font-bold text-emerald-800 uppercase tracking-wider block mb-0.5 sm:mb-1">
             Current Price
           </span>
-          <span className="text-2xl sm:text-3xl font-extrabold text-emerald-950 font-sans tracking-tight">
+          <span className="text-xl sm:text-3xl font-extrabold text-emerald-950 font-sans tracking-tight">
             ₹{currentPrice}
           </span>
-          <span className="text-[10px] text-emerald-700 font-semibold block mt-1">
-            {dropPercentage > 0 ? `₹${priceDifference} (${dropPercentage}%) below peak` : 'Best current price'}
+          <span className="text-[10px] text-emerald-700 font-semibold block mt-0.5 sm:mt-1 truncate">
+            {dropPercentage > 0 ? `₹${priceDifference} (${dropPercentage}%) off peak` : 'Best current price'}
           </span>
         </div>
 
-        <div className="p-4 rounded-2xl bg-[#f9fafb] border border-black/[0.05]">
-          <span className="text-[11px] font-bold text-[#86868b] uppercase tracking-wider block mb-1">
+        <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-[#f9fafb] border border-black/[0.05]">
+          <span className="text-[10px] sm:text-[11px] font-bold text-[#86868b] uppercase tracking-wider block mb-0.5 sm:mb-1">
             Lowest Recorded
           </span>
-          <span className="text-2xl sm:text-3xl font-extrabold text-[#1d1d1f] font-sans tracking-tight">
+          <span className="text-xl sm:text-3xl font-extrabold text-[#1d1d1f] font-sans tracking-tight">
             ₹{lowestPrice}
           </span>
-          <span className="text-[10px] text-emerald-700 font-semibold block mt-1">
-            Recorded in Jun 2026
+          <span className="text-[10px] text-emerald-700 font-semibold block mt-0.5 sm:mt-1 truncate">
+            Jun 2026 low
           </span>
         </div>
 
-        <div className="p-4 rounded-2xl bg-[#f9fafb] border border-black/[0.05]">
-          <span className="text-[11px] font-bold text-[#86868b] uppercase tracking-wider block mb-1">
+        <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-[#f9fafb] border border-black/[0.05]">
+          <span className="text-[10px] sm:text-[11px] font-bold text-[#86868b] uppercase tracking-wider block mb-0.5 sm:mb-1">
             Average Price
           </span>
-          <span className="text-2xl sm:text-3xl font-extrabold text-[#1d1d1f] font-sans tracking-tight">
+          <span className="text-xl sm:text-3xl font-extrabold text-[#1d1d1f] font-sans tracking-tight">
             ₹{averagePrice}
           </span>
-          <span className="text-[10px] text-[#86868b] font-medium block mt-1">
+          <span className="text-[10px] text-[#86868b] font-medium block mt-0.5 sm:mt-1 truncate">
             Past 6 months mean
           </span>
         </div>
 
-        <div className="p-4 rounded-2xl bg-[#f9fafb] border border-black/[0.05]">
-          <span className="text-[11px] font-bold text-[#86868b] uppercase tracking-wider block mb-1">
+        <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-[#f9fafb] border border-black/[0.05]">
+          <span className="text-[10px] sm:text-[11px] font-bold text-[#86868b] uppercase tracking-wider block mb-0.5 sm:mb-1">
             Highest Peak
           </span>
-          <span className="text-2xl sm:text-3xl font-extrabold text-[#1d1d1f] font-sans tracking-tight">
+          <span className="text-xl sm:text-3xl font-extrabold text-[#1d1d1f] font-sans tracking-tight">
             ₹{highestPrice}
           </span>
-          <span className="text-[10px] text-rose-600 font-semibold block mt-1">
+          <span className="text-[10px] text-rose-600 font-semibold block mt-0.5 sm:mt-1 truncate">
             Aug 2026 Season
           </span>
         </div>
       </div>
 
       {/* SVG Interactive Chart Box */}
-      <div className="p-4 sm:p-6 rounded-2xl bg-[#fbfbfd] border border-black/[0.05] relative overflow-hidden">
+      <div className="p-3.5 sm:p-6 rounded-xl sm:rounded-2xl bg-[#fbfbfd] border border-black/[0.05] relative overflow-hidden">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-1.5 text-xs font-bold text-neutral-800">
             <Calendar className="w-3.5 h-3.5 text-emerald-700" />
             <span>6-Month Price Trend Timeline</span>
           </div>
-          <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800">
+          <span className="text-[10px] sm:text-[11px] font-bold px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800">
             Good Time to Buy ✓
           </span>
         </div>
 
         {/* Chart SVG */}
-        <div className="w-full overflow-x-auto py-2">
+        <div className="w-full overflow-x-auto py-2 no-scrollbar">
           <svg 
             viewBox={`0 0 ${chartWidth} ${chartHeight}`} 
-            className="w-full h-36 min-w-[380px] overflow-visible"
+            className="w-full h-28 sm:h-36 overflow-visible"
           >
             <defs>
               <linearGradient id="priceGradient" x1="0%" y1="0%" x2="0%" y2="100%">

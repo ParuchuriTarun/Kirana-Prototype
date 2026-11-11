@@ -119,60 +119,53 @@ export default function ProductDetailPage({
   };
 
   return (
-    <div className="w-[94%] sm:w-[96%] max-w-[1400px] mx-auto px-1 sm:px-4 py-3 sm:py-8 pb-24 sm:pb-8 font-sans antialiased text-[#1d1d1f]">
+    <div className="w-[94%] sm:w-[96%] max-w-[1400px] mx-auto px-1 sm:px-4 py-2 sm:py-8 pb-32 sm:pb-8 font-sans antialiased text-[#1d1d1f]">
       
       {/* ==================== BREADCRUMBS & TOP BAR ==================== */}
-      <nav aria-label="Breadcrumb" className="flex flex-wrap items-center justify-between gap-3 mb-6">
-        <div className="flex items-center gap-1.5 sm:gap-2 text-xs text-[#86868b]">
-          <button
-            type="button"
-            onClick={onBack}
-            className="inline-flex items-center gap-1 font-semibold text-emerald-800 hover:text-emerald-950 transition-colors cursor-pointer bg-emerald-50/80 px-2.5 py-1 rounded-full border border-emerald-200/60"
-          >
-            <ArrowLeft className="w-3.5 h-3.5 stroke-[2.2]" />
-            <span>Back to Products</span>
-          </button>
-          
-          <span className="text-neutral-300">/</span>
-          <span className="hover:text-[#1d1d1f] cursor-pointer" onClick={onBack}>
-            {product.category || 'Shop'}
-          </span>
-          <span className="text-neutral-300">/</span>
-          <span className="font-semibold text-[#1d1d1f] truncate max-w-[180px] sm:max-w-xs">
-            {product.name}
-          </span>
-        </div>
+      <div className="flex items-center justify-between gap-2 mb-3.5 sm:mb-6">
+        <button
+          type="button"
+          onClick={onBack}
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white hover:bg-neutral-50 active:scale-95 border border-black/[0.08] text-xs font-bold text-neutral-800 shadow-2xs transition-all cursor-pointer"
+        >
+          <ArrowLeft className="w-3.5 h-3.5 stroke-[2.4]" />
+          <span>Back to Store</span>
+        </button>
 
-        {/* Quick Action Icons: Share & Favorite */}
         <div className="flex items-center gap-2">
+          <span className="text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200/80 truncate max-w-[120px] hidden xs:inline-block">
+            {product.category || 'Grocery'}
+          </span>
+
           <button
             type="button"
             onClick={handleShare}
-            className="w-8 h-8 rounded-full bg-white hover:bg-neutral-100 border border-black/[0.08] flex items-center justify-center text-[#1d1d1f] shadow-2xs transition-colors cursor-pointer"
+            className="w-8 h-8 rounded-full bg-white hover:bg-neutral-100 active:scale-90 border border-black/[0.08] flex items-center justify-center text-neutral-700 shadow-2xs transition-all cursor-pointer"
             title="Share Product"
           >
             <Share2 className="w-3.5 h-3.5" />
           </button>
+          
           <button
             type="button"
             onClick={() => {
               setIsLiked(!isLiked);
               if (showNotice) showNotice(!isLiked ? 'Added to your favorites' : 'Removed from favorites');
             }}
-            className={`w-8 h-8 rounded-full border flex items-center justify-center shadow-2xs transition-colors cursor-pointer ${
+            className={`w-8 h-8 rounded-full border flex items-center justify-center shadow-2xs active:scale-90 transition-all cursor-pointer ${
               isLiked 
                 ? 'bg-rose-50 border-rose-200 text-rose-600' 
-                : 'bg-white hover:bg-neutral-100 border-black/[0.08] text-[#1d1d1f]'
+                : 'bg-white hover:bg-neutral-100 border-black/[0.08] text-neutral-700'
             }`}
             title="Favorite"
           >
             <Heart className={`w-3.5 h-3.5 ${isLiked ? 'fill-rose-500 text-rose-500' : ''}`} />
           </button>
         </div>
-      </nav>
+      </div>
 
       {/* ==================== MAIN PRODUCT HERO SECTION ==================== */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12 bg-white rounded-[24px] sm:rounded-[32px] border border-black/[0.06] p-3.5 sm:p-8 lg:p-10 shadow-[0_4px_30px_rgba(0,0,0,0.04)]">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-8 lg:gap-12 bg-white rounded-2xl sm:rounded-[32px] border border-black/[0.06] p-3.5 sm:p-8 lg:p-10 shadow-[0_4px_30px_rgba(0,0,0,0.04)]">
         
         {/* LEFT COLUMN: PRODUCT VISUALS (5 of 12 cols) */}
         <div className="lg:col-span-5 flex flex-col gap-4">
@@ -535,50 +528,50 @@ export default function ProductDetailPage({
       <ProductPriceHistory product={product} />
 
       {/* ==================== 2. TRUST, FRESHNESS & SERVICE ASSURANCE ==================== */}
-      <section className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
-        <div className="p-4 rounded-2xl bg-white border border-black/[0.06] shadow-xs flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-800 flex items-center justify-center shrink-0 border border-emerald-100">
-            <Award className="w-5 h-5 text-emerald-700" />
+      <section className="mt-8 sm:mt-10 grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3.5">
+        <div className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-white border border-black/[0.06] shadow-xs flex items-center gap-3">
+          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-emerald-50 text-emerald-800 flex items-center justify-center shrink-0 border border-emerald-100">
+            <Award className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-700" />
           </div>
-          <div>
-            <h4 className="text-xs font-bold text-neutral-900">100% Quality Guarantee</h4>
-            <p className="text-[11px] text-neutral-500">Certified farm-direct freshness</p>
-          </div>
-        </div>
-
-        <div className="p-4 rounded-2xl bg-white border border-black/[0.06] shadow-xs flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-800 flex items-center justify-center shrink-0 border border-blue-100">
-            <Clock className="w-5 h-5 text-blue-700" />
-          </div>
-          <div>
-            <h4 className="text-xs font-bold text-neutral-900">12–15 Min Delivery</h4>
-            <p className="text-[11px] text-neutral-500">Dispatched from neighborhood hub</p>
+          <div className="min-w-0">
+            <h4 className="text-[11px] sm:text-xs font-bold text-neutral-900 truncate">100% Quality</h4>
+            <p className="text-[10px] sm:text-[11px] text-neutral-500 truncate">Farm-direct fresh</p>
           </div>
         </div>
 
-        <div className="p-4 rounded-2xl bg-white border border-black/[0.06] shadow-xs flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-800 flex items-center justify-center shrink-0 border border-amber-100">
-            <RotateCcw className="w-5 h-5 text-amber-700" />
+        <div className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-white border border-black/[0.06] shadow-xs flex items-center gap-3">
+          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-blue-50 text-blue-800 flex items-center justify-center shrink-0 border border-blue-100">
+            <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-blue-700" />
           </div>
-          <div>
-            <h4 className="text-xs font-bold text-neutral-900">24h Hassle-Free Returns</h4>
-            <p className="text-[11px] text-neutral-500">Instant credit or replacement</p>
+          <div className="min-w-0">
+            <h4 className="text-[11px] sm:text-xs font-bold text-neutral-900 truncate">12–15 Min Delivery</h4>
+            <p className="text-[10px] sm:text-[11px] text-neutral-500 truncate">Neighborhood hub</p>
           </div>
         </div>
 
-        <div className="p-4 rounded-2xl bg-white border border-black/[0.06] shadow-xs flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-800 flex items-center justify-center shrink-0 border border-purple-100">
-            <ShieldCheck className="w-5 h-5 text-purple-700" />
+        <div className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-white border border-black/[0.06] shadow-xs flex items-center gap-3">
+          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-amber-50 text-amber-800 flex items-center justify-center shrink-0 border border-amber-100">
+            <RotateCcw className="w-4 h-4 sm:w-5 sm:h-5 text-amber-700" />
           </div>
-          <div>
-            <h4 className="text-xs font-bold text-neutral-900">FSSAI Certified Safety</h4>
-            <p className="text-[11px] text-neutral-500">Hygienic multi-layer packing</p>
+          <div className="min-w-0">
+            <h4 className="text-[11px] sm:text-xs font-bold text-neutral-900 truncate">24h Free Returns</h4>
+            <p className="text-[10px] sm:text-[11px] text-neutral-500 truncate">Instant replacement</p>
+          </div>
+        </div>
+
+        <div className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-white border border-black/[0.06] shadow-xs flex items-center gap-3">
+          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-purple-50 text-purple-800 flex items-center justify-center shrink-0 border border-purple-100">
+            <ShieldCheck className="w-4 h-4 sm:w-5 sm:h-5 text-purple-700" />
+          </div>
+          <div className="min-w-0">
+            <h4 className="text-[11px] sm:text-xs font-bold text-neutral-900 truncate">FSSAI Certified</h4>
+            <p className="text-[10px] sm:text-[11px] text-neutral-500 truncate">Multi-layer packing</p>
           </div>
         </div>
       </section>
 
       {/* ==================== 3. PRODUCT FAQS ACCORDION ==================== */}
-      <section className="mt-10 p-5 sm:p-8 bg-white rounded-[28px] border border-black/[0.06] shadow-[0_4px_30px_rgba(0,0,0,0.03)]">
+      <section className="mt-8 sm:mt-10 p-4 sm:p-8 bg-white rounded-2xl sm:rounded-[28px] border border-black/[0.06] shadow-[0_4px_30px_rgba(0,0,0,0.03)]">
         <div className="flex items-center gap-2 mb-6">
           <span className="p-1.5 rounded-lg bg-emerald-50 text-emerald-800">
             <HelpCircle className="w-4 h-4" />
@@ -685,6 +678,90 @@ export default function ProductDetailPage({
           </div>
         </section>
       )}
+
+      {/* ==================== MOBILE STICKY FLOATING BOTTOM ACTION BAR ==================== */}
+      <aside 
+        aria-label="Mobile Quick Purchase Bar"
+        className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-2xl border-t border-black/[0.08] px-4 py-2.5 shadow-[0_-8px_30px_rgba(0,0,0,0.12)] flex items-center justify-between gap-3 safe-area-bottom"
+      >
+        <div className="min-w-0">
+          <span className="text-[10px] text-neutral-400 font-semibold uppercase tracking-wider block leading-none">
+            Total Price
+          </span>
+          <div className="flex items-baseline gap-1.5 mt-0.5">
+            <span className="text-xl font-extrabold text-[#1d1d1f] tracking-tight">
+              ₹{product.price}
+            </span>
+            {hasDiscount && (
+              <span className="text-xs text-neutral-400 line-through">
+                ₹{originalPrice}
+              </span>
+            )}
+            {hasDiscount && (
+              <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1 rounded border border-emerald-200">
+                {discountPercent}% OFF
+              </span>
+            )}
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 shrink-0">
+          {product.stock === 0 || product.stockStatus === 'out_of_stock' ? (
+            <span className="px-4 py-2.5 rounded-full bg-neutral-100 text-neutral-400 font-bold text-xs">
+              Out of Stock
+            </span>
+          ) : quantity === 0 ? (
+            <>
+              <button
+                type="button"
+                onClick={() => onAdd(product)}
+                className="px-3.5 py-2.5 rounded-full bg-emerald-700 active:bg-emerald-800 text-white font-bold text-xs shadow-md shadow-emerald-700/20 flex items-center gap-1.5 active:scale-95 transition-all cursor-pointer"
+              >
+                <ShoppingBag className="w-3.5 h-3.5" />
+                <span>Add to Cart</span>
+              </button>
+              <button
+                type="button"
+                onClick={handleBuyNow}
+                className="px-3.5 py-2.5 rounded-full bg-[#1d1d1f] active:bg-black text-white font-bold text-xs shadow-xs active:scale-95 transition-all cursor-pointer"
+              >
+                Buy Now
+              </button>
+            </>
+          ) : (
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3 px-2 py-1 rounded-full bg-emerald-800 text-white shadow-xs">
+                <button
+                  type="button"
+                  onClick={() => onRemove(product)}
+                  className="w-7 h-7 rounded-full hover:bg-white/10 flex items-center justify-center active:scale-90 transition-transform cursor-pointer"
+                  aria-label="Decrease quantity"
+                >
+                  <Minus className="w-3.5 h-3.5 stroke-[2.5]" />
+                </button>
+                <span className="font-extrabold text-xs min-w-[18px] text-center">
+                  {quantity}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => onAdd(product)}
+                  className="w-7 h-7 rounded-full hover:bg-white/10 flex items-center justify-center active:scale-90 transition-transform cursor-pointer"
+                  aria-label="Increase quantity"
+                >
+                  <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
+                </button>
+              </div>
+              <button
+                type="button"
+                onClick={onOpenCart}
+                className="px-3 py-2 rounded-full bg-emerald-50 border border-emerald-300 text-emerald-900 font-bold text-xs active:scale-95 transition-all cursor-pointer"
+              >
+                View Cart &rarr;
+              </button>
+            </div>
+          )}
+        </div>
+      </aside>
 
     </div>
   );

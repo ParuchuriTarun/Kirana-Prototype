@@ -29,7 +29,7 @@ export default function MobileBottomNav({
       id: 'orders',
       label: 'Orders',
       icon: Package,
-      action: () => onNavigate('orders'),
+      action: () => (user ? onNavigate('orders') : onOpenLogin()),
       isActive: currentPage === 'orders'
     },
     {
@@ -42,9 +42,9 @@ export default function MobileBottomNav({
     },
     {
       id: 'profile',
-      label: user?.isGuest ? 'Guest' : 'Account',
+      label: user ? (user.isGuest ? 'Guest' : 'Account') : 'Sign In',
       icon: User,
-      action: () => onNavigate('profile'),
+      action: () => (user ? onNavigate('profile') : onOpenLogin()),
       isActive: currentPage === 'profile'
     }
   ];

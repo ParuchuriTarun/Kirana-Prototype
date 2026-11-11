@@ -835,8 +835,8 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      {/* Sleek Mobile Bottom Navigation Bar - Only visible when logged in (at least as guest) */}
-      {!welcomeActive && currentPage !== 'admin' && Boolean(user) && (
+      {/* Sleek Mobile Bottom Navigation Bar - Visible on mobile for all main pages except product detail (which has sticky purchase bar) */}
+      {!welcomeActive && currentPage !== 'admin' && currentPage !== 'product' && (
         <MobileBottomNav
           currentPage={currentPage}
           onNavigate={(target) => navigateTo(target)}

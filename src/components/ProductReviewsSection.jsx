@@ -164,20 +164,20 @@ export default function ProductReviewsSection({ product, isModalOpen, onCloseMod
       </AnimatePresence>
 
       {/* Main Review Section Card */}
-      <div className="bg-white rounded-[32px] border border-black/[0.06] p-5 sm:p-8 lg:p-10 shadow-[0_4px_30px_rgba(0,0,0,0.03)]">
+      <div className="bg-white rounded-2xl sm:rounded-[32px] border border-black/[0.06] p-4 sm:p-8 lg:p-10 shadow-[0_4px_30px_rgba(0,0,0,0.03)]">
         
         {/* Section Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-8 border-b border-black/[0.06]">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 pb-5 sm:pb-8 border-b border-black/[0.06]">
           <div>
             <div className="flex items-center gap-2 mb-1">
               <span className="p-1.5 rounded-lg bg-amber-50 text-amber-800">
                 <Star className="w-4 h-4 fill-amber-500 text-amber-500" />
               </span>
-              <h2 className="text-xl sm:text-2xl font-extrabold text-[#1d1d1f] tracking-tight">
+              <h2 className="text-lg sm:text-2xl font-extrabold text-[#1d1d1f] tracking-tight">
                 Customer Ratings &amp; Reviews
               </h2>
             </div>
-            <p className="text-xs text-[#86868b]">
+            <p className="text-[11px] sm:text-xs text-[#86868b]">
               Verified feedback from actual shoppers who received delivery from this store
             </p>
           </div>
@@ -185,7 +185,7 @@ export default function ProductReviewsSection({ product, isModalOpen, onCloseMod
           <button
             type="button"
             onClick={() => setIsWriteModalOpen(true)}
-            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-sm cursor-pointer transition-all shrink-0"
+            className="inline-flex items-center justify-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-sm cursor-pointer transition-all w-full sm:w-auto shrink-0"
           >
             <Plus className="w-4 h-4" />
             <span>Write a Review</span>
